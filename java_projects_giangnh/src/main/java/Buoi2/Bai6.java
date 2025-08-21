@@ -1,3 +1,5 @@
+package Buoi2;
+
 import java.util.Scanner;
 
 public class Bai6 {
@@ -9,15 +11,12 @@ public class Bai6 {
         System.out.print("Xep loai: ");
         if (diemTB >= 8) {
             System.out.println("Gioi");
-                    }
-        else if (diemTB >= 6.5) {
+        } else if (diemTB >= 6.5) {
             System.out.println("Kha");
 
-                }
-        else if (diemTB >= 5) {
+        } else if (diemTB >= 5) {
             System.out.println("Trung binh");
-            }
-        else {
+        } else {
             System.out.println("Yeu");
         }
     }
