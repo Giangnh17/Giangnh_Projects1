@@ -58,6 +58,7 @@ public class Main {
                     break;
 
                 //Update điểm theo ID
+                // Nên update, remove bên ngoài vòng for (gán index bên trong rồi xóa/sửa bên ngoài)
                 case 4:
                     System.out.println("Nhập ID sinh viên cần sửa:");
                     int updateID = scanner.nextInt();
