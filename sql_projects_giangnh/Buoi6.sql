@@ -8,7 +8,7 @@ SELECT * FROM Customers WHERE City IN ('Hanoi', 'Hue');
 
 -- 3. Liệt kê khách hàng có tên bắt đầu bằng chữ C kết thúc bằng chữ E​
 
-SELECT * FROM Customers WHERE Name LIKE 'C%' AND Name LIKE '%e';
+SELECT * FROM Customers WHERE Name LIKE 'C%e';
 
 -- 4. Hiển thị danh sách 5 khách hàng đầu tiên sau khi sắp xếp theo name tăng dần.​
 
