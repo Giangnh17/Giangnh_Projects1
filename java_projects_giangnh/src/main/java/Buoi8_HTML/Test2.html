@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Lung Linh</title>
+    <!-- Import font từ Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@300;500;700&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+    <style>
+        /* Reset CSS nhẹ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Roboto', sans-serif;
+          background: linear-gradient(to right, #87cefa, #e6f7ff);
+          color: #333;
+          line-height: 1.6;
+        }
+
+        header {
+          background: #1e90ff;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          font-family: 'Pacifico', cursive;
+          font-size: 32px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        nav {
+          background: #00bfff;
+          display: flex;
+          justify-content: center;
+          gap: 30px;
+          padding: 15px;
+        }
+
+        nav a {
+          color: white;
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 18px;
+          transition: 0.3s;
+        }
+
+        nav a:hover {
+          color: #ffeb3b;
+          transform: scale(1.1);
+        }
+
+        .banner {
+          background: url("https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
+          height: 300px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 48px;
+          font-family: 'Playfair Display', serif;
+          text-shadow: 3px 3px 8px rgba(0,0,0,0.6);
+        }
+
+        main {
+          padding: 40px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
+        }
+
+        .card {
+          background: white;
+          border-radius: 15px;
+          padding: 20px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+          font-family: 'Playfair Display', serif;
+          color: #1e90ff;
+          margin-bottom: 10px;
+        }
+
+        .card p {
+          font-family: 'Roboto', sans-serif;
+          font-size: 15px;
+        }
+
+        footer {
+          text-align: center;
+          padding: 20px;
+          background: #1e90ff;
+          color: white;
+          margin-top: 30px;
+          font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<header>🌸 Web Lung Linh Xanh Da Trời 🌸</header>
+
+<nav>
+    <a href="#">Trang chủ</a>
+    <a href="#">Giới thiệu</a>
+    <a href="#">Dịch vụ</a>
+    <a href="#">Liên hệ</a>
+</nav>
+
+<div class="banner">
+    Chào mừng đến với thế giới lung linh!
+</div>
+
+<main>
+    <div class="card">
+        <h2>✨ Thiết kế hiện đại</h2>
+        <p>Sử dụng màu xanh da trời làm chủ đạo, kết hợp bóng đổ và hiệu ứng hover để tạo cảm giác sang trọng.</p>
+    </div>
+    <div class="card">
+        <h2>🎨 Font chữ đa dạng</h2>
+        <p>Kết hợp Roboto dễ đọc, Playfair Display sang trọng và Pacifico mềm mại cho tiêu đề.</p>
+    </div>
+    <div class="card">
+        <h2>🌐 Tương thích</h2>
+        <p>Thiết kế responsive với grid, hiển thị đẹp trên mọi màn hình từ điện thoại đến desktop.</p>
+    </div>
+</main>
+
+<footer>
+    &copy; 2025 Web Lung Linh. Mọi quyền được bảo lưu.
+</footer>
+
+</body>
+</html>

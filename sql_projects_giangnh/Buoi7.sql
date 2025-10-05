@@ -75,3 +75,8 @@ JOIN Products p
     ON od.ProductID = p.ProductID
 GROUP BY c.CustomerID, c.Name
 ORDER BY TotalValue DESC;
+
+-- Tìm sản phẩm có giá cao thứ 3
+SELECT * FROM Products WHERE Price = (
+SELECT Price FROM Products GROUP BY Price ORDER BY Price DESC
+OFFSET 2 ROWS FETCH NEXT 1 ROWS ONLY);
