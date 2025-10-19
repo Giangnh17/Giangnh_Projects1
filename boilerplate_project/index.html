@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mô tả ngắn về website">
+    <meta name="keywords" content="từ khóa, website, dự án">
+    <meta name="author" content="Tên tác giả">
+    
+    <title>Tên Website - Trang chủ</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    
+    <!-- Google Fonts (example) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header__logo">
+                <a href="index.html">
+                    <img src="assets/images/logo.png" alt="Logo" class="logo">
+                </a>
+            </div>
+            <nav class="header__nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link nav-link--active">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/about.html" class="nav-link">Giới thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/contact.html" class="nav-link">Liên hệ</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="header__mobile-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero__content">
+                    <h1 class="hero__title">Chào mừng đến với Website</h1>
+                    <p class="hero__description">Đây là mô tả ngắn về website hoặc dự án của bạn.</p>
+                    <div class="hero__actions">
+                        <a href="#" class="btn btn--primary">Bắt đầu</a>
+                        <a href="#" class="btn btn--secondary">Tìm hiểu thêm</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Section -->
+        <section class="content">
+            <div class="container">
+                <div class="content__wrapper">
+                    <h2 class="section-title">Nội dung chính</h2>
+                    <div class="content__grid">
+                        <div class="content__item">
+                            <h3>Tiêu đề 1</h3>
+                            <p>Nội dung mô tả cho mục 1.</p>
+                        </div>
+                        <div class="content__item">
+                            <h3>Tiêu đề 2</h3>
+                            <p>Nội dung mô tả cho mục 2.</p>
+                        </div>
+                        <div class="content__item">
+                            <h3>Tiêu đề 3</h3>
+                            <p>Nội dung mô tả cho mục 3.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__section">
+                    <h4>Liên hệ</h4>
+                    <p>Email: contact@example.com</p>
+                    <p>Điện thoại: 0123 456 789</p>
+                </div>
+                <div class="footer__section">
+                    <h4>Liên kết</h4>
+                    <ul>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">LinkedIn</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <p>&copy; 2025 - Tên website. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

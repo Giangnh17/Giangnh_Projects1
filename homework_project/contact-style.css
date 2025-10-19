@@ -1,4 +1,3 @@
-
 header {
     background-color: rgb(189, 249, 255);
     display: flex;
@@ -22,7 +21,7 @@ header .address {
     font-weight: bold;
 }
 
-.contact-form #contact-label {
+#contact-form #contact-label {
     display: flex;
     justify-content: center;
     font-family: 'Times New Roman', Times, serif;
@@ -30,7 +29,7 @@ header .address {
     font-weight: bold;
 }
 
-.contact-form {
+#contact-form {
     margin-left: 30%;
     margin-right: 30%;
 }
@@ -61,7 +60,7 @@ label {
     border-radius: 20%;
 }
 
-.contact-form #name, #email, select{
+#contact-form #name, #email, select{
     width: 100%;
     height: 30px;
     border-radius: 10px;
@@ -69,7 +68,7 @@ label {
     padding: 5px;
 }
 
-.contact-form textarea{
+#contact-form textarea{
     width: 100%;
     height: 100px;
     border-radius: 10px;
@@ -85,4 +84,14 @@ label {
     background-color: black;
     text-decoration: none aliceblue;
     text-align: center;
+}
+
+/* Style cho div hiển thị kết quả */
+#result {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    font-family: 'Times New Roman', Times, serif;
 }

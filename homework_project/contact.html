@@ -17,7 +17,7 @@
         </div>
     </header>
 
-    <form class="contact-form">
+    <form id="contact-form">
         <h1 class="label" id="contact-label">Liên hệ với chúng tôi</h1>
         <br>
         <label for="name">Họ và tên:</label><br>
@@ -29,23 +29,23 @@
         <label for="message">Nội dung liên hệ:</label><br>
         <textarea id="message" name="message" rows="4" cols="50"></textarea><br><br>
 
-        <label for="sex">Giới tính:</label><br>
-        <div class="sex-option">
-            <input type="radio" id="male" name="sex" value="male">
+        <label for="gender">Giới tính:</label><br>
+        <div class="gender-option">
+            <input type="radio" id="male" name="gender" value="male">
             <label for="male">Nam</label>
-            <input type="radio" id="female" name="sex" value="female">
+            <input type="radio" id="female" name="gender" value="female">
             <label for="female">Nữ</label><br>
         </div><br>
         
         <label for="hobbies">Sở thích</label>
-        <div class="hobbies">
-            <input type="checkbox" id="anime" value="Xem anime">
+        <div class="contact-hobbies">
+            <input type="checkbox" id="anime" name="hobbies" value="Xem anime">
             <label for="anime">Xem anime</label>
-            <input type="checkbox" id="manga" value="Đọc manga">
+            <input type="checkbox" id="manga" name="hobbies" value="Đọc manga">
             <label for="manga">Đọc manga</label>
-            <input type="checkbox" id="travel" value="Du lịch">
+            <input type="checkbox" id="travel" name="hobbies" value="Du lịch">
             <label for="travel">Du lịch</label>
-            <input type="checkbox" id="game" value="Chơi game">
+            <input type="checkbox" id="game" name="hobbies" value="Chơi game">
             <label for="game">Chơi game</label>
         </div><br>
 
@@ -62,6 +62,9 @@
         </div>
     </form>
 
+    <!-- Thêm div để hiển thị kết quả -->
+    <div id="result" style="display: none;"></div>
+
     <footer class="footer" style="color: aliceblue;">
         <hr>
         Liên hệ với chúng tôi qua:
@@ -70,4 +73,5 @@
         <p>Bản quyền © 2025 - GiangNH</p>
     </footer>
 </body>
+<script src="main.js"></script>
 </html>
