@@ -130,13 +130,9 @@ function generatePersonalInfo() {
         if (skillsList) {
             const skillsData = [
                 'Giao tiếp tiếng Nhật (N2 level)',
-                'Thiết kế giao diện web với HTML/CSS',
                 'Lập trình JavaScript cơ bản',
                 'Sử dụng thành thạo Microsoft Office',
-                'Kỹ năng thuyết trình và present',
-                'Quản lý thời gian và dự án hiệu quả',
                 'Dịch thuật Nhật - Việt',
-                'Chỉnh sửa ảnh với Photoshop'
             ];
             
             // Xóa nội dung cũ và thêm mới
