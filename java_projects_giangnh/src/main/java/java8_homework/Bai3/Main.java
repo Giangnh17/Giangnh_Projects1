@@ -9,7 +9,7 @@ public class Main {
         List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
 
         //Lấy ra danh sách số chẵn
-        List<Integer> evenNumbers = numbers.stream().filter(n -> n % 2 == 0).collect(Collectors.toList());
+        List<Integer> evenNumbers = numbers.stream().filter(n -> n % 2 == 0).toList();
         System.out.println("Số chẵn:" + evenNumbers);
 
         // Lấy danh sách bình phương các số > 3
