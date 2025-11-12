@@ -1,0 +1,167 @@
+{
+	"info": {
+		"_postman_id": "56224697-3817-451b-98aa-7838e878d4d8",
+		"name": "api_homework",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49933637",
+		"_collection_link": "https://giangnh17-3614483.postman.co/workspace/Sarly's-Workspace~b6ec7fb0-7a63-4dd2-8061-6c748129fb95/collection/49933637-56224697-3817-451b-98aa-7838e878d4d8?action=share&source=collection_link&creator=49933637"
+	},
+	"item": [
+		{
+			"name": "api_products",
+			"item": [
+				{
+					"name": "get all products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://691428f3f34a2ff1170e6cd5.mockapi.io/Products",
+							"protocol": "https",
+							"host": [
+								"691428f3f34a2ff1170e6cd5",
+								"mockapi",
+								"io"
+							],
+							"path": [
+								"Products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get products by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://691428f3f34a2ff1170e6cd5.mockapi.io/Products/30",
+							"protocol": "https",
+							"host": [
+								"691428f3f34a2ff1170e6cd5",
+								"mockapi",
+								"io"
+							],
+							"path": [
+								"Products",
+								"30"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get products by field",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://691428f3f34a2ff1170e6cd5.mockapi.io/Products?category=kids",
+							"protocol": "https",
+							"host": [
+								"691428f3f34a2ff1170e6cd5",
+								"mockapi",
+								"io"
+							],
+							"path": [
+								"Products"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "kids"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create new product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n        \"name\": \"Lua to tam\",\r\n        \"price\": \"65\",\r\n        \"category\": \"Lụa\",\r\n        \"stock\": \"53\",\r\n        \"createdAt\": \"2024-02-24T09:29:35.990Z\",\r\n        \"id\": \"9\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://691428f3f34a2ff1170e6cd5.mockapi.io/Products",
+							"protocol": "https",
+							"host": [
+								"691428f3f34a2ff1170e6cd5",
+								"mockapi",
+								"io"
+							],
+							"path": [
+								"Products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update product",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Frozen Plastic\",\r\n    \"price\": \"6.35\",\r\n    \"category\": \"Kids\",\r\n    \"stock\": \"685\",\r\n    \"createdAt\": \"2025-04-04T19:48:08.256Z\",\r\n    \"id\": \"30\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://691428f3f34a2ff1170e6cd5.mockapi.io/Products/30",
+							"protocol": "https",
+							"host": [
+								"691428f3f34a2ff1170e6cd5",
+								"mockapi",
+								"io"
+							],
+							"path": [
+								"Products",
+								"30"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n        \"name\": \"Lua to tam\",\r\n        \"price\": \"65\",\r\n        \"category\": \"Lụa\",\r\n        \"stock\": \"53\",\r\n        \"createdAt\": \"2024-02-24T09:29:35.990Z\",\r\n        \"id\": \"9\"\r\n    }"
+						},
+						"url": {
+							"raw": "https://691428f3f34a2ff1170e6cd5.mockapi.io/Products/15",
+							"protocol": "https",
+							"host": [
+								"691428f3f34a2ff1170e6cd5",
+								"mockapi",
+								"io"
+							],
+							"path": [
+								"Products",
+								"15"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
