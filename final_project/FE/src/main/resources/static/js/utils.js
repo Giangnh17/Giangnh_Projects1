@@ -1,7 +1,49 @@
 // ============================================
-// HỆ THỐNG QUẢN LÝ THƯ VIỆN - TIỆN ÍCH CHUNG
-// LIBRARY MANAGEMENT SYSTEM - UTILITIES
+// HỆ THỐNG QUẢN LÝ THƯ VIỆN - TIỆN ÍCH CHUNG & APP INITIALIZATION
+// LIBRARY MANAGEMENT SYSTEM - UTILITIES & APP INIT
 // ============================================
+
+// ============================================
+// APPLICATION INITIALIZATION
+// ============================================
+
+// Initialize the application when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🏛️ Trang web Quản lý thư viện sách Sarly - Initializing...');
+  
+  // Initialize the appropriate page
+  initializePage();
+  
+  // Set up global event listeners
+  setupGlobalEventListeners();
+});
+
+function initializePage() {
+  const path = window.location.pathname;
+  
+  if (path.includes('auth-login') || path.endsWith('login.html')) {
+    initializeLoginPage();
+  } else if (path.includes('auth-register') || path.endsWith('register.html')) {
+    initializeRegisterPage();
+  } else if (path.includes('index') || path === '/' || path.endsWith('index.html')) {
+    initializeDashboard();
+  } else if (path.includes('book-detail') || path.endsWith('detail.html')) {
+    initializeBookDetail();
+  } else if (path.includes('book-form') || path.endsWith('form.html')) {
+    initializeBookForm();
+  }
+}
+
+function setupGlobalEventListeners() {
+  // Global keyboard shortcuts
+  document.addEventListener('keydown', function(event) {
+    // Escape key to close modals/forms
+    if (event.key === 'Escape') {
+      const modals = document.querySelectorAll('.modal.show');
+      modals.forEach(modal => modal.style.display = 'none');
+    }
+  });
+}
 
 // ============================================
 // NAVIGATION FUNCTIONS
@@ -15,27 +57,76 @@ function editBook(bookId) {
   window.location.href = `/src/main/resources/templates/book-form.html?edit=${bookId}`;
 }
 
-function deleteBook(bookId) {
-  const book = BOOKS_DATA.find(b => b.id === bookId);
-  if (!book) {
-    showError('Book not found');
-    return;
+async function deleteBookFromDashboard(bookId) {
+  await deleteBookRecord(bookId);
+}
+
+async function deleteBookRecord(bookId) {
+  try {
+    // First get book details for confirmation
+    const bookResult = await getBookById(bookId);
+    
+    let bookTitle = 'this book';
+    let bookAuthor = '';
+    
+    if (bookResult.success && bookResult.data) {
+      bookTitle = bookResult.data.title;
+      bookAuthor = bookResult.data.author;
+    } else {
+      // Fallback to mock data
+      const book = BOOKS_DATA.find(b => b.id === bookId);
+      if (book) {
+        bookTitle = book.title;
+        bookAuthor = book.author;
+      }
+    }
+    
+    const confirmMessage = `Are you sure you want to delete "${bookTitle}"${bookAuthor ? ` by ${bookAuthor}` : ''}?\n\nThis action cannot be undone.`;
+    
+    if (confirm(confirmMessage)) {
+      const result = await deleteBook(bookId);
+      
+      if (result.success) {
+        showSuccess('Book deleted successfully');
+        
+        // Redirect to dashboard after deletion
+        setTimeout(() => {
+          window.location.href = '/src/main/resources/templates/index.html';
+        }, 1500);
+      } else {
+        showError(result.error || 'Failed to delete book');
+      }
+    }
+  } catch (error) {
+    console.error('Delete book error:', error);
+    showError('An error occurred while deleting the book. Please try again.');
+  }
+}
+
+// ============================================
+// USER MANAGEMENT FUNCTIONS
+// ============================================
+
+function getUserDisplayInfo() {
+  const user = getCurrentUser();
+  if (user) {
+    return {
+      name: user.name || user.username || 'Unknown User',
+      role: user.role || 'GUEST',
+      initial: (user.name || user.username || 'U').charAt(0).toUpperCase()
+    };
   }
   
-  const confirmMessage = `Are you sure you want to delete "${book.title}" by ${book.author}?\n\nThis action cannot be undone.`;
-  
-  if (confirm(confirmMessage)) {
-    // Remove from array
-    const bookIndex = BOOKS_DATA.findIndex(b => b.id === bookId);
-    if (bookIndex > -1) {
-      BOOKS_DATA.splice(bookIndex, 1);
-      showSuccess('Book deleted successfully');
-      
-      // Redirect to dashboard after deletion
-      setTimeout(() => {
-        window.location.href = '/src/main/resources/templates/index.html';
-      }, 1500);
-    }
+  return {
+    name: 'Demo User',
+    role: 'GUEST', 
+    initial: 'U'
+  };
+}
+
+async function handleLogout() {
+  if (confirm('Are you sure you want to logout?')) {
+    await logout();
   }
 }
 
@@ -263,3 +354,9 @@ function setupGlobalEventListeners() {
     }
   });
 }
+
+// ============================================ 
+// INITIALIZATION COMPLETE
+// ============================================
+
+console.log('🏛️ Library Management System - Utils & App Init Loaded Successfully!');

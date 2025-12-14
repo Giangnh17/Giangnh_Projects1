@@ -3,7 +3,7 @@
 // LIBRARY MANAGEMENT SYSTEM - BOOK DETAIL
 // ============================================
 
-function initializeBookDetail() {
+async function initializeBookDetail() {
   console.log('Initializing Book Detail Page');
   
   // Get book ID from URL parameters
@@ -11,7 +11,7 @@ function initializeBookDetail() {
   const bookId = urlParams.get('id');
   
   if (bookId) {
-    renderBookDetail(parseInt(bookId));
+    await renderBookDetail(parseInt(bookId));
   } else {
     // If no ID provided, show error or redirect
     showError('Book ID not provided');
@@ -21,28 +21,55 @@ function initializeBookDetail() {
   }
 }
 
-function renderBookDetail(bookId) {
-  const book = BOOKS_DATA.find(b => b.id === bookId);
-  
-  if (!book) {
-    showError('Book not found');
-    setTimeout(() => {
-      window.location.href = '/src/main/resources/templates/index.html';
-    }, 2000);
-    return;
+async function renderBookDetail(bookId) {
+  try {
+    const result = await getBookById(bookId);
+    
+    if (result.success && result.data) {
+      const book = result.data;
+      
+      // Update page title
+      document.title = `${book.title} - Trang web Quản lý thư viện sách Sarly`;
+      
+      // Update book info sections
+      updateBookInfo(book);
+      
+      // Render borrow history (if available in API response)
+      renderBorrowHistory(book.borrowHistory || []);
+      
+      // Set up action buttons
+      setupBookActions(book);
+    } else {
+      showError(result.error || 'Book not found');
+      
+      // Fallback to mock data
+      const book = BOOKS_DATA.find(b => b.id === bookId);
+      if (book) {
+        updateBookInfo(book);
+        renderBorrowHistory(book.borrowHistory);
+        setupBookActions(book);
+      } else {
+        setTimeout(() => {
+          window.location.href = '/src/main/resources/templates/index.html';
+        }, 2000);
+      }
+    }
+  } catch (error) {
+    console.error('Error loading book details:', error);
+    showError('Error loading book details. Please try again.');
+    
+    // Fallback to mock data
+    const book = BOOKS_DATA.find(b => b.id === bookId);
+    if (book) {
+      updateBookInfo(book);
+      renderBorrowHistory(book.borrowHistory);
+      setupBookActions(book);
+    } else {
+      setTimeout(() => {
+        window.location.href = '/src/main/resources/templates/index.html';
+      }, 2000);
+    }
   }
-  
-  // Update page title
-  document.title = `${book.title} - Trang web Quản lý thư viện sách Sarly`;
-  
-  // Update book info sections
-  updateBookInfo(book);
-  
-  // Render borrow history
-  renderBorrowHistory(book.borrowHistory);
-  
-  // Set up action buttons
-  setupBookActions(book);
 }
 
 function updateBookInfo(book) {

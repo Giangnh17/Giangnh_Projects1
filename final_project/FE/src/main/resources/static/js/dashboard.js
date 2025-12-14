@@ -3,8 +3,17 @@
 // LIBRARY MANAGEMENT SYSTEM - DASHBOARD
 // ============================================
 
-function initializeDashboard() {
+async function initializeDashboard() {
   console.log('Initializing Dashboard');
+  
+  // Check authentication
+  if (!isAuthenticated()) {
+    window.location.href = '/src/main/resources/templates/auth-login.html';
+    return;
+  }
+  
+  // Load books from API
+  await loadBooksFromAPI();
   
   // Render the books table
   renderBooksTable();
@@ -17,6 +26,26 @@ function initializeDashboard() {
   
   // Set up add book button
   setupAddBookButton();
+}
+
+async function loadBooksFromAPI() {
+  try {
+    const result = await getAllBooks();
+    
+    if (result.success) {
+      // Update BOOKS_DATA with data from API
+      BOOKS_DATA = result.data || [];
+      console.log('Books loaded from API:', BOOKS_DATA.length);
+    } else {
+      console.error('Failed to load books:', result.error);
+      showError('Failed to load books: ' + result.error);
+      // Keep using mock data as fallback
+    }
+  } catch (error) {
+    console.error('Error loading books:', error);
+    showError('Error loading books. Using offline data.');
+    // Keep using mock data as fallback
+  }
 }
 
 function renderBooksTable() {

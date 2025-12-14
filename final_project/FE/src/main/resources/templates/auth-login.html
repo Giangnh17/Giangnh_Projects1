@@ -29,24 +29,24 @@
                 <form id="loginForm" class="auth-form" method="post" th:action="@{/login}">
                     <!-- Thông báo lỗi -->
                     <div th:if="${param.error}" class="alert" style="background: var(--color-borrowed); color: var(--color-background); padding: var(--spacing-md); border-radius: var(--radius-sm); margin-bottom: var(--spacing-lg); text-align: center;">
-                        Tên đăng nhập hoặc mật khẩu không chính xác. Vui lòng thử lại.
+                        Email hoặc mật khẩu không chính xác. Vui lòng thử lại.
                     </div>
                     
                     <div th:if="${param.logout}" class="alert" style="background: var(--color-available); color: var(--color-background); padding: var(--spacing-md); border-radius: var(--radius-sm); margin-bottom: var(--spacing-lg); text-align: center;">
                         Bạn đã đăng xuất thành công.
                     </div>
                     
-                    <!-- Trường tên đăng nhập -->
+                    <!-- Trường email -->
                     <div class="form-group">
-                        <label for="username" class="form-label">Tên đăng nhập</label>
+                        <label for="username" class="form-label">Email</label>
                         <input 
-                            type="text" 
+                            type="email" 
                             id="username" 
                             name="username" 
                             class="form-control" 
-                            placeholder="Nhập tên đăng nhập thư viện"
+                            placeholder="Nhập email của bạn"
                             required
-                            autocomplete="username"
+                            autocomplete="email"
                             th:value="${username}"
                         >
                     </div>
@@ -94,18 +94,6 @@
                         <a href="/src/main/resources/templates/auth-register.html" style="font-weight: 600;">Đăng ký thành viên thư viện</a>
                     </p>
                 </div>
-                
-                <!-- Tài khoản Demo -->
-                <div style="margin-top: var(--spacing-xl); padding: var(--spacing-lg); background: var(--color-background); border-radius: var(--radius-sm); border: 1px solid var(--color-accent);">
-                    <h4 style="margin-bottom: var(--spacing-md); text-align: center;">Tài khoản Demo</h4>
-                    <div style="display: grid; gap: var(--spacing-sm); font-size: 0.9rem;">
-                        <div><strong>Thủ thư viện:</strong> librarian / password123</div>
-                        <div><strong>Người xem:</strong> viewer / password123</div>
-                    </div>
-                    <p style="margin-top: var(--spacing-md); font-size: 0.85rem; color: var(--color-accent); text-align: center; font-style: italic;">
-                        Sử dụng các tài khoản này để khám phá các vai trò khác nhau
-                    </p>
-                </div>
             </div>
         </div>
         
@@ -118,18 +106,18 @@
     </div>
     
     <!-- JavaScript Modules -->
+    <script src="/src/main/resources/static/js/api-service.js"></script>
     <script src="/src/main/resources/static/js/data.js"></script>
     <script src="/src/main/resources/static/js/utils.js"></script>
     <script src="/src/main/resources/static/js/auth.js"></script>
-    <script src="/src/main/resources/static/js/app.js"></script>
     
     <!-- Page-specific JavaScript -->
     <script>
-        // Auto-focus username field
+        // Auto-focus email field
         document.addEventListener('DOMContentLoaded', function() {
-            const usernameField = document.getElementById('username');
-            if (usernameField && !usernameField.value) {
-                usernameField.focus();
+            const emailField = document.getElementById('username');
+            if (emailField && !emailField.value) {
+                emailField.focus();
             }
         });
         

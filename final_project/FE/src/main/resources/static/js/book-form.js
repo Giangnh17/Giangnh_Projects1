@@ -27,21 +27,64 @@ function initializeBookForm() {
   setupFormValidation();
 }
 
-function populateFormForEdit(bookId) {
-  const book = BOOKS_DATA.find(b => b.id === bookId);
-  if (!book) {
-    showError('Book not found');
-    return;
+async function populateFormForEdit(bookId) {
+  try {
+    const result = await getBookById(bookId);
+    
+    if (result.success && result.data) {
+      const book = result.data;
+      
+      // Populate form fields
+      document.getElementById('bookTitleInput').value = book.title || '';
+      document.getElementById('bookAuthorInput').value = book.author || '';
+      document.getElementById('bookISBNInput').value = book.isbn || '';
+      document.getElementById('bookCategoryInput').value = book.category || '';
+      document.getElementById('bookPublisherInput').value = book.publisher || '';
+      document.getElementById('bookStatusSelect').value = book.status || 'available';
+      document.getElementById('bookDescriptionInput').value = book.description || '';
+      
+      // Update form title and submit button
+      const formTitle = document.querySelector('.card-title');
+      if (formTitle) {
+        formTitle.textContent = 'Edit Book Information';
+      }
+      
+      const submitBtn = document.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.innerHTML = 'Update Record';
+      }
+      
+      // Store the book ID for updating
+      document.getElementById('bookForm').dataset.editId = bookId;
+    } else {
+      showError(result.error || 'Book not found');
+      // Fallback to mock data
+      const book = BOOKS_DATA.find(b => b.id === bookId);
+      if (book) {
+        // Use mock data if API fails
+        fillFormWithBook(book);
+      }
+    }
+  } catch (error) {
+    console.error('Error loading book data:', error);
+    showError('Error loading book data. Please try again.');
+    
+    // Fallback to mock data
+    const book = BOOKS_DATA.find(b => b.id === bookId);
+    if (book) {
+      fillFormWithBook(book);
+    }
   }
-  
-  // Populate form fields
-  document.getElementById('title').value = book.title;
-  document.getElementById('author').value = book.author;
-  document.getElementById('isbn').value = book.isbn;
-  document.getElementById('category').value = book.category;
-  document.getElementById('publisher').value = book.publisher;
-  document.getElementById('status').value = book.status;
-  document.getElementById('description').value = book.description;
+}
+
+function fillFormWithBook(book) {
+  document.getElementById('bookTitleInput').value = book.title || '';
+  document.getElementById('bookAuthorInput').value = book.author || '';
+  document.getElementById('bookISBNInput').value = book.isbn || '';
+  document.getElementById('bookCategoryInput').value = book.category || '';
+  document.getElementById('bookPublisherInput').value = book.publisher || '';
+  document.getElementById('bookStatusSelect').value = book.status || 'available';
+  document.getElementById('bookDescriptionInput').value = book.description || '';
   
   // Update form title and submit button
   const formTitle = document.querySelector('.card-title');
@@ -55,19 +98,22 @@ function populateFormForEdit(bookId) {
   }
   
   // Store the book ID for updating
-  document.getElementById('bookForm').dataset.editId = bookId;
+  document.getElementById('bookForm').dataset.editId = book.id;
 }
 
 function handleBookFormSubmit(event) {
   event.preventDefault();
   
-  // Get form data
-  const formData = new FormData(event.target);
-  const bookData = {};
-  
-  formData.forEach((value, key) => {
-    bookData[key] = value;
-  });
+  // Get form data using correct field names from HTML template
+  const bookData = {
+    title: document.getElementById('bookTitleInput').value.trim(),
+    author: document.getElementById('bookAuthorInput').value.trim(), 
+    isbn: document.getElementById('bookISBNInput').value.trim(),
+    category: document.getElementById('bookCategoryInput').value,
+    publisher: document.getElementById('bookPublisherInput').value.trim() || 'Unknown Publisher',
+    description: document.getElementById('bookDescriptionInput').value.trim() || 'No description available',
+    status: document.getElementById('bookStatusSelect').value
+  };
   
   // Validate required fields
   if (!validateBookForm(bookData)) {
@@ -78,10 +124,10 @@ function handleBookFormSubmit(event) {
   
   if (editId) {
     // Update existing book
-    updateBook(parseInt(editId), bookData);
+    updateBookRecord(parseInt(editId), bookData);
   } else {
     // Create new book
-    createBook(bookData);
+    createBookRecord(bookData);
   }
 }
 
@@ -109,44 +155,48 @@ function validateBookForm(bookData) {
   return isValid;
 }
 
-function createBook(bookData) {
-  // Generate new ID
-  const newId = Math.max(...BOOKS_DATA.map(b => b.id)) + 1;
-  
-  // Create new book object
-  const newBook = {
-    id: newId,
-    ...bookData,
-    borrowHistory: []
-  };
-  
-  // Add to books array
-  BOOKS_DATA.push(newBook);
-  
-  showSuccess('Book created successfully!');
-  setTimeout(() => {
-    window.location.href = `/src/main/resources/templates/book-detail.html?id=${newId}`;
-  }, 1500);
+async function createBookRecord(bookData) {
+  try {
+    const result = await createBook(bookData);
+    
+    if (result.success) {
+      showSuccess('Book created successfully!');
+      
+      // Get the created book ID from response
+      const newBookId = result.data?.id || result.data;
+      
+      setTimeout(() => {
+        if (newBookId) {
+          window.location.href = `/src/main/resources/templates/book-detail.html?id=${newBookId}`;
+        } else {
+          window.location.href = '/src/main/resources/templates/index.html';
+        }
+      }, 1500);
+    } else {
+      showError(result.error || 'Failed to create book');
+    }
+  } catch (error) {
+    console.error('Create book error:', error);
+    showError('An error occurred while creating the book. Please try again.');
+  }
 }
 
-function updateBook(bookId, bookData) {
-  const bookIndex = BOOKS_DATA.findIndex(b => b.id === bookId);
-  
-  if (bookIndex === -1) {
-    showError('Book not found');
-    return;
+async function updateBookRecord(bookId, bookData) {
+  try {
+    const result = await updateBook(bookId, bookData);
+    
+    if (result.success) {
+      showSuccess('Book updated successfully!');
+      setTimeout(() => {
+        window.location.href = `/src/main/resources/templates/book-detail.html?id=${bookId}`;
+      }, 1500);
+    } else {
+      showError(result.error || 'Failed to update book');
+    }
+  } catch (error) {
+    console.error('Update book error:', error);
+    showError('An error occurred while updating the book. Please try again.');
   }
-  
-  // Update book data (preserve ID and borrow history)
-  BOOKS_DATA[bookIndex] = {
-    ...BOOKS_DATA[bookIndex],
-    ...bookData
-  };
-  
-  showSuccess('Book updated successfully!');
-  setTimeout(() => {
-    window.location.href = `/src/main/resources/templates/book-detail.html?id=${bookId}`;
-  }, 1500);
 }
 
 function setupCancelButtons() {

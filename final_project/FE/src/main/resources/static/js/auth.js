@@ -10,9 +10,6 @@ function initializeLoginPage() {
   if (loginForm) {
     loginForm.addEventListener('submit', handleLogin);
   }
-  
-  // Add demo role buttons for testing
-  addDemoRoleButtons();
 }
 
 function initializeRegisterPage() {
@@ -38,36 +35,58 @@ function initializeRegisterPage() {
   }
 }
 
-function handleLogin(event) {
+async function handleLogin(event) {
   event.preventDefault();
   
-  const username = document.getElementById('username').value;
+  const email = document.getElementById('username').value;
   const password = document.getElementById('password').value;
   
   // Simple validation
-  if (!username || !password) {
-    showError('Please fill in all fields');
+  if (!email || !password) {
+    showError('Vui lòng điền đầy đủ thông tin');
+    return;
+  }
+
+  // Email format validation  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showError('Vui lòng nhập đúng định dạng email');
     return;
   }
   
-  // Mock authentication
-  if (username === 'admin' && password === 'admin') {
-    showSuccess('Login successful! Redirecting...');
-    setTimeout(() => {
+  // Disable submit button to prevent double submission
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Đang đăng nhập...';
+  }
+  
+  try {
+    const result = await login({ email, password });
+    
+    if (result.success) {
+      showSuccess('Đăng nhập thành công! Đang chuyển trang...');
+      
       // Redirect to dashboard
-      window.location.href = '/src/main/resources/templates/index.html';
-    }, 1500);
-  } else if (username === 'librarian' && password === 'lib123') {
-    showSuccess('Librarian login successful!');
-    setTimeout(() => {
-      window.location.href = '/src/main/resources/templates/index.html';
-    }, 1500);
-  } else {
-    showError('Invalid credentials. Try: admin/admin or librarian/lib123');
+      setTimeout(() => {
+        window.location.href = '/src/main/resources/templates/index.html';
+      }, 1500);
+    } else {
+      showError(result.error || 'Đăng nhập thất bại');
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    showError('Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.');
+  } finally {
+    // Re-enable submit button
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Đăng nhập vào Thư viện';
+    }
   }
 }
 
-function handleRegister(event) {
+async function handleRegister(event) {
   event.preventDefault();
   
   const formData = new FormData(event.target);
@@ -83,11 +102,37 @@ function handleRegister(event) {
     return;
   }
   
-  // Mock registration
-  showSuccess('Registration successful! Please check your email for confirmation.');
-  setTimeout(() => {
-    window.location.href = '/src/main/resources/templates/auth-login.html';
-  }, 2000);
+  // Remove confirmPassword from API request
+  delete userData.confirmPassword;
+  
+  // Disable submit button to prevent double submission
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating Account...';
+  }
+  
+  try {
+    const result = await register(userData);
+    
+    if (result.success) {
+      showSuccess('Registration successful! Redirecting to login...');
+      setTimeout(() => {
+        window.location.href = '/src/main/resources/templates/auth-login.html';
+      }, 2000);
+    } else {
+      showError(result.error || 'Registration failed');
+    }
+  } catch (error) {
+    console.error('Register error:', error);
+    showError('An error occurred during registration. Please try again.');
+  } finally {
+    // Re-enable submit button
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create Account';
+    }
+  }
 }
 
 function validatePasswordMatch() {
@@ -127,27 +172,4 @@ function checkUsernameAvailability() {
     indicator.textContent = isAvailable ? 'Username is available' : 'Username is already taken';
     indicator.style.color = isAvailable ? 'var(--color-available)' : 'var(--color-borrowed)';
   }, 500);
-}
-
-function addDemoRoleButtons() {
-  const loginCard = document.querySelector('.auth-card');
-  if (!loginCard) return;
-  
-  const demoSection = document.createElement('div');
-  demoSection.innerHTML = `
-    <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-accent);">
-      <h4 style="text-align: center; margin-bottom: var(--spacing-md); color: var(--color-accent);">Demo Accounts</h4>
-      <div style="display: flex; gap: var(--spacing-sm); justify-content: center;">
-        <button type="button" class="btn btn-outline" onclick="fillDemoCredentials('admin', 'admin')">Admin</button>
-        <button type="button" class="btn btn-outline" onclick="fillDemoCredentials('librarian', 'lib123')">Librarian</button>
-      </div>
-    </div>
-  `;
-  
-  loginCard.appendChild(demoSection);
-}
-
-function fillDemoCredentials(username, password) {
-  document.getElementById('username').value = username;
-  document.getElementById('password').value = password;
 }
