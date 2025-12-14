@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Membership Application - The Grand Library</title>
+    
+    <!-- CSS riêng cho trang đăng ký -->
+    <link rel="stylesheet" href="/src/main/resources/static/css/auth-register.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    
+    <!-- Meta tags -->
+    <meta name="description" content="Apply for membership at The Grand Library Management System">
+    <meta name="keywords" content="library, membership, registration, books">
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="auth-container">
+            <div class="auth-card card">
+                <!-- Header -->
+                <div class="auth-header">
+                    <h1 class="auth-title">Membership Application</h1>
+                    <p class="auth-subtitle">"Join our community of knowledge seekers"</p>
+                </div>
+                
+                <!-- Registration Form -->
+                <form id="registerForm" class="auth-form" method="post" th:action="@{/register}">
+                    <!-- Full Name Field -->
+                    <div class="form-group">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="fullName" 
+                            name="fullName" 
+                            class="form-control" 
+                            placeholder="Enter your complete name"
+                            required
+                            autocomplete="name"
+                        >
+                    </div>
+                    
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-control" 
+                            placeholder="your.email@example.com"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+                    
+                    <!-- Username Field -->
+                    <div class="form-group">
+                        <label for="username" class="form-label">Preferred Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-control" 
+                            placeholder="Choose a unique username"
+                            required
+                            autocomplete="username"
+                            minlength="3"
+                        >
+                        <small style="color: var(--color-accent); font-size: 0.85rem; margin-top: var(--spacing-xs); display: block;">
+                            Username must be at least 3 characters long
+                        </small>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-control" 
+                            placeholder="Create a secure password"
+                            required
+                            autocomplete="new-password"
+                            minlength="6"
+                        >
+                        <small style="color: var(--color-accent); font-size: 0.85rem; margin-top: var(--spacing-xs); display: block;">
+                            Password must be at least 6 characters long
+                        </small>
+                    </div>
+                    
+                    <!-- Confirm Password Field -->
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            class="form-control" 
+                            placeholder="Confirm your password"
+                            required
+                            autocomplete="new-password"
+                        >
+                    </div>
+                    
+                    <!-- Terms & Conditions -->
+                    <div class="form-group">
+                        <label style="display: flex; align-items: flex-start; gap: var(--spacing-sm); font-weight: normal; cursor: pointer; line-height: 1.4;">
+                            <input 
+                                type="checkbox" 
+                                id="terms" 
+                                name="terms"
+                                required
+                                style="width: auto; margin: 4px 0 0 0; flex-shrink: 0;"
+                            >
+                            <span>
+                                I agree to the <a href="#" style="font-weight: 600;">Library Terms of Service</a> 
+                                and <a href="#" style="font-weight: 600;">Privacy Policy</a>. 
+                                I understand that library privileges may be revoked for misuse of materials or facilities.
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <!-- Newsletter Subscription -->
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm); font-weight: normal; cursor: pointer;">
+                            <input 
+                                type="checkbox" 
+                                id="newsletter" 
+                                name="newsletter"
+                                style="width: auto; margin: 0;"
+                            >
+                            Subscribe to our monthly newsletter with new arrivals and library events
+                        </label>
+                    </div>
+                    
+                    <!-- CSRF Token -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-lg">
+                        Apply for Membership
+                    </button>
+                </form>
+                
+                <!-- Login Link -->
+                <div class="auth-links">
+                    <p>
+                        Already a member? 
+                        <a href="/src/main/resources/templates/auth-login.html" style="font-weight: 600;">Sign in to your account</a>
+                    </p>
+                </div>
+                
+                <!-- Membership Benefits -->
+                <div style="margin-top: var(--spacing-xl); padding: var(--spacing-lg); background: var(--color-background); border-radius: var(--radius-sm); border: 1px solid var(--color-accent);">
+                    <h4 style="margin-bottom: var(--spacing-md); text-align: center;">Membership Benefits</h4>
+                    <div style="display: grid; gap: var(--spacing-sm); font-size: 0.9rem;">
+                        <div>Access to over 10,000+ books and resources</div>
+                        <div>Home delivery and pickup services</div>
+                        <div>Digital library and e-book collections</div>
+                        <div>Priority booking for library events and workshops</div>
+                        <div>🤝 Community discussion groups and book clubs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer Quote -->
+        <div style="position: fixed; bottom: var(--spacing-lg); left: 50%; transform: translateX(-50%); text-align: center; color: var(--color-accent); font-size: 0.9rem;">
+            <p style="margin: 0; font-style: italic;">
+                "The only thing you absolutely have to know is the location of the library." — Albert Einstein
+            </p>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <!-- JavaScript Modules -->
+    <script src="/src/main/resources/static/js/data.js"></script>
+    <script src="/src/main/resources/static/js/utils.js"></script>
+    <script src="/src/main/resources/static/js/auth.js"></script>
+    <script src="/src/main/resources/static/js/app.js"></script>
+    
+    <!-- Page-specific JavaScript -->
+    <script>
+        // Auto-focus full name field
+        document.addEventListener('DOMContentLoaded', function() {
+            const fullNameField = document.getElementById('fullName');
+            if (fullNameField) {
+                fullNameField.focus();
+            }
+        });
+        
+        // Real-time password match validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            
+            function checkPasswordMatch() {
+                if (confirmPassword.value && password.value !== confirmPassword.value) {
+                    confirmPassword.style.borderBottomColor = 'var(--color-borrowed)';
+                    
+                    // Add or update error message
+                    let errorMsg = confirmPassword.parentElement.querySelector('.password-match-error');
+                    if (!errorMsg) {
+                        errorMsg = document.createElement('small');
+                        errorMsg.className = 'password-match-error';
+                        errorMsg.style.cssText = 'color: var(--color-borrowed); font-size: 0.85rem; margin-top: var(--spacing-xs); display: block;';
+                        confirmPassword.parentElement.appendChild(errorMsg);
+                    }
+                    errorMsg.textContent = 'Passwords do not match';
+                } else {
+                    confirmPassword.style.borderBottomColor = confirmPassword.value ? 'var(--color-available)' : 'var(--color-accent)';
+                    
+                    // Remove error message
+                    const errorMsg = confirmPassword.parentElement.querySelector('.password-match-error');
+                    if (errorMsg) {
+                        errorMsg.remove();
+                    }
+                }
+            }
+            
+            confirmPassword.addEventListener('input', checkPasswordMatch);
+            password.addEventListener('input', checkPasswordMatch);
+        });
+        
+        // Username availability indicator (mock)
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameField = document.getElementById('username');
+            let debounceTimer;
+            
+            usernameField.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                
+                // Remove existing indicator
+                const existingIndicator = usernameField.parentElement.querySelector('.username-indicator');
+                if (existingIndicator) {
+                    existingIndicator.remove();
+                }
+                
+                if (this.value.length >= 3) {
+                    debounceTimer = setTimeout(() => {
+                        // Mock username check
+                        const isAvailable = !['admin', 'root', 'librarian', 'test'].includes(this.value.toLowerCase());
+                        
+                        const indicator = document.createElement('small');
+                        indicator.className = 'username-indicator';
+                        indicator.style.cssText = `color: ${isAvailable ? 'var(--color-available)' : 'var(--color-borrowed)'}; font-size: 0.85rem; margin-top: var(--spacing-xs); display: block; font-weight: 600;`;
+                        indicator.textContent = isAvailable ? 'Username is available' : 'Username is already taken';
+                        
+                        this.parentElement.appendChild(indicator);
+                    }, 800);
+                }
+            });
+        });
+        
+        // Add entrance animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const authCard = document.querySelector('.auth-card');
+            if (authCard) {
+                authCard.style.opacity = '0';
+                authCard.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    authCard.style.transition = 'all 0.6s ease-out';
+                    authCard.style.opacity = '1';
+                    authCard.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        });
+        
+        // Enhanced form validation styling
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            const inputs = form.querySelectorAll('.form-control');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.checkValidity()) {
+                        this.style.borderBottomColor = 'var(--color-available)';
+                    } else if (this.value.trim() !== '') {
+                        this.style.borderBottomColor = 'var(--color-borrowed)';
+                    }
+                });
+                
+                input.addEventListener('input', function() {
+                    if (this.style.borderBottomColor === 'rgb(191, 54, 12)') { // var(--color-borrowed)
+                        this.style.borderBottomColor = 'var(--color-accent)';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

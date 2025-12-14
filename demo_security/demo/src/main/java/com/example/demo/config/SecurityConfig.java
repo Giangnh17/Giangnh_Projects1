@@ -24,6 +24,8 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
+                //sửa dòng này
+
 
         return http.build();
     }

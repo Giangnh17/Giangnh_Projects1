@@ -1,0 +1,685 @@
+/* ============================================
+   CSS CHO TRANG CHỦ/DASHBOARD - INDEX
+   VINTAGE ACADEMIA LIBRARY THEME
+============================================ */
+
+/* Import Google Fonts - Fonts hỗ trợ tiếng Việt */
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+
+/* ============================================
+   BIẾN CSS - BẢNG MÀU VINTAGE ACADEMIA
+============================================ */
+:root {
+  /* Màu sắc chính */
+  --color-background: #F5F1E6;
+  --color-surface: #EFEBE9;
+  --color-primary-text: #3E2723;
+  --color-accent: #5D4037;
+  --color-primary-btn: #4E342E;
+  --color-primary-hover: #6D4C41;
+  --color-available: #33691E;
+  --color-borrowed: #BF360C;
+  --color-lost: #455A64;
+  
+  /* Kiểu chữ */
+  --font-heading: 'Crimson Text', 'Century Schoolbook', 'Times New Roman', serif;
+  --font-body: 'Source Sans Pro', 'Segoe UI', Arial, sans-serif;
+  
+  /* Khoảng cách */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  
+  /* Bóng đổ */
+  --shadow-light: 0 2px 4px rgba(62, 39, 35, 0.1);
+  --shadow-medium: 0 4px 8px rgba(62, 39, 35, 0.15);
+  --shadow-heavy: 0 8px 16px rgba(62, 39, 35, 0.2);
+  
+  /* Bo góc */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  /* Sidebar */
+  --sidebar-width: 260px;
+  
+  /* Sidebar */
+  --sidebar-width: 260px;
+}
+
+/* ============================================
+   STYLES CƠ BẢN
+============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-primary-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  font-size: 0.9rem; /* Reduced font size */
+  background-image: 
+    radial-gradient(circle at 1px 1px, rgba(93, 64, 55, 0.05) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--color-accent);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ============================================
+   LAYOUT TRANG CHỦ
+============================================ */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.main-content {
+  flex: 1;
+  padding: var(--spacing-xxl) 0;
+}
+
+/* ============================================
+   NAVBAR - THANH ĐIỀU HƯỚNG
+============================================ */
+.navbar {
+  background: var(--color-primary-btn);
+  color: var(--color-background);
+  padding: var(--spacing-md) 0;
+  box-shadow: var(--shadow-medium);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-brand {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-background);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  transition: color 0.3s ease;
+}
+
+.navbar-brand:hover {
+  color: rgba(245, 241, 230, 0.8);
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--color-background);
+  color: var(--color-primary-btn);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* ============================================
+   TOOLBAR - THANH CÔNG CỤ
+============================================ */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--color-accent);
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.search-container {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-accent);
+  font-size: 1rem;
+  z-index: 2;
+}
+
+.search-input {
+  padding-left: calc(var(--spacing-xxl) + var(--spacing-sm));
+  width: 100%;
+}
+
+/* ============================================
+   FORM CONTROLS
+============================================ */
+.form-control {
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  background: var(--color-background);
+  color: var(--color-primary-text);
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary-btn);
+  box-shadow: 0 0 0 3px rgba(78, 52, 46, 0.1);
+}
+
+/* ============================================
+   BUTTONS
+============================================ */
+.btn {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  white-space: nowrap;
+}
+
+.btn {
+  background: var(--color-primary-btn);
+  color: var(--color-background);
+}
+
+.btn:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn-outline:hover {
+  background: var(--color-accent);
+  color: var(--color-background);
+}
+
+/* ============================================
+   BẢNG SÁCH - BOOKS TABLE
+============================================ */
+.table-container {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--color-accent);
+  margin-bottom: var(--spacing-xl);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table th {
+  background: var(--color-primary-btn);
+  color: var(--color-background);
+  padding: var(--spacing-lg);
+  text-align: left;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  border-bottom: 2px solid var(--color-accent);
+}
+
+.table td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid rgba(93, 64, 55, 0.1);
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background: rgba(245, 241, 230, 0.5);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================
+   STATUS BADGES - NHÃN TRẠNG THÁI
+============================================ */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-available {
+  background: rgba(51, 105, 30, 0.1);
+  color: var(--color-available);
+  border: 1px solid var(--color-available);
+}
+
+.status-borrowed {
+  background: rgba(191, 54, 12, 0.1);
+  color: var(--color-borrowed);
+  border: 1px solid var(--color-borrowed);
+}
+
+.status-lost {
+  background: rgba(69, 90, 100, 0.1);
+  color: var(--color-lost);
+  border: 1px solid var(--color-lost);
+}
+
+/* ============================================
+   ACTION BUTTONS - NÚT HÀNH ĐỘNG
+============================================ */
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+}
+
+.btn-view {
+  background: var(--color-accent);
+  color: var(--color-background);
+}
+
+.btn-edit {
+  background: var(--color-available);
+  color: var(--color-background);
+}
+
+.btn-delete {
+  background: var(--color-borrowed);
+  color: var(--color-background);
+}
+
+.btn-sm:hover {
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   EMPTY STATE - TRẠNG THÁI TRỐNG
+============================================ */
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  color: var(--color-accent);
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.8;
+}
+
+/* ============================================
+   ROLE-BASED VISIBILITY
+============================================ */
+.librarian-only {
+  display: block;
+}
+
+.viewer-only {
+  display: none;
+}
+
+.role-viewer .librarian-only {
+  display: none;
+}
+
+.role-viewer .viewer-only {
+  display: block;
+}
+
+/* ============================================
+   LOADING STATES
+============================================ */
+.loading-row td {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  color: var(--color-accent);
+  font-style: italic;
+}
+
+/* ============================================
+   SCROLL TO TOP BUTTON
+============================================ */
+.scroll-to-top {
+  position: fixed;
+  bottom: var(--spacing-xl);
+  right: var(--spacing-xl);
+  width: 50px;
+  height: 50px;
+  background: var(--color-primary-btn);
+  color: var(--color-background);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-medium);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.scroll-to-top:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-2px);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+============================================ */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+  
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+  
+  .toolbar-left {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .search-container {
+    max-width: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-content {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .user-info {
+    order: -1;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .table {
+    min-width: 600px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .main-content {
+    padding: var(--spacing-lg) 0;
+  }
+  
+  .navbar {
+    padding: var(--spacing-sm) 0;
+  }
+  
+  .user-info {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .table th,
+  .table td {
+    padding: var(--spacing-sm);
+  }
+  
+  .scroll-to-top {
+    bottom: var(--spacing-lg);
+    right: var(--spacing-lg);
+    width: 45px;
+    height: 45px;
+  }
+}
+
+/* ============================================
+   ANIMATIONS
+============================================ */
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   SIDEBAR STYLES
+============================================ */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 80px; /* Below navbar */
+  width: var(--sidebar-width);
+  height: calc(100vh - 80px);
+  background: var(--color-surface);
+  border-right: 2px solid var(--color-accent);
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-nav {
+  padding: var(--spacing-lg);
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin-bottom: var(--spacing-sm);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  color: var(--color-primary-text);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.nav-link:hover {
+  background: var(--color-accent);
+  color: var(--color-background);
+  transform: translateX(4px);
+}
+
+.nav-item.active .nav-link {
+  background: var(--color-primary-btn);
+  color: var(--color-background);
+}
+
+.nav-icon {
+  font-size: 1.2rem;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-text {
+  font-weight: 500;
+}
+
+/* Main Content with Sidebar */
+.main-content.with-sidebar {
+  margin-left: var(--sidebar-width);
+  padding-top: var(--spacing-xl);
+}
+
+/* Navbar positioning */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+}
+
+/* ============================================
+   UTILITY CLASSES
+============================================ */
+.text-center {
+  text-align: center;
+}
+
+.mb-xl {
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Responsive sidebar */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  
+  .main-content.with-sidebar {
+    margin-left: 0;
+  }
+  
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biểu mẫu Sách - Trang web Quản lý thư viện sách Sarly</title>
+    
+    <!-- CSS riêng cho biểu mẫu sách -->
+    <link rel="stylesheet" href="/src/main/resources/static/css/book-form.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    
+    <!-- Thẻ meta -->
+    <meta name="description" content="Thêm hoặc chỉnh sửa thông tin sách">
+    <meta name="keywords" content="thư viện, sách, thêm, chỉnh sửa, biểu mẫu">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="container">
+                <div class="navbar-content">
+                    <!-- Brand/Logo -->
+                    <a href="/src/main/resources/templates/index.html" class="navbar-brand">
+                        Trang web Quản lý thư viện sách Sarly
+                    </a>
+                    
+                    <!-- User Info and Actions -->
+                    <div class="navbar-nav">
+                        <!-- User Information -->
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <span>L</span>
+                            </div>
+                            <div>
+                                <div class="user-name">Demo Librarian</div>
+                                <div style="font-size: 0.8rem; color: rgba(245, 241, 230, 0.8);">Librarian</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cancel Button -->
+                        <button id="cancelBtn" class="btn btn-outline" style="border-color: rgba(245, 241, 230, 0.5); color: var(--color-background);">
+                            Hủy
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="/src/main/resources/templates/index.html" class="nav-link">
+                            <span class="nav-text">Màn hình chính</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/src/main/resources/templates/user-form.html" class="nav-link">
+                            <span class="nav-text">Thêm người dùng</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/src/main/resources/templates/book-form.html" class="nav-link">
+                            <span class="nav-text">Thêm sách mới</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showReports()">
+                            <span class="nav-text">Báo cáo</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showSettings()">
+                            <span class="nav-text">Cài đặt</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content with-sidebar">
+            <div class="container">
+                <!-- Tiêu đề trang -->
+                <div class="mb-xl">
+                    <h1 class="page-title">Thông tin Sách</h1>
+                    <p class="page-subtitle">
+                        Thêm mới hoặc cập nhật thông tin sách trong hệ thống
+                    </p>
+                </div>
+                    
+                <!-- Book Form -->
+                <div class="form-wrapper">
+                    <div class="card form-card">
+                        <form id="bookForm" class="book-form">
+                            <!-- Hidden field for book ID (edit mode) -->
+                            <input type="hidden" id="bookId" name="id">
+                            
+                            <!-- Error message container -->
+                            <div id="errorMessage" class="alert" style="display: none; background: var(--color-borrowed); color: var(--color-background); padding: var(--spacing-md); border-radius: var(--radius-sm); margin-bottom: var(--spacing-lg); text-align: center;"></div>
+                            
+                            <!-- Success message container -->
+                            <div id="successMessage" class="alert" style="display: none; background: var(--color-available); color: var(--color-background); padding: var(--spacing-md); border-radius: var(--radius-sm); margin-bottom: var(--spacing-lg); text-align: center;"></div>
+                            
+                            <!-- CSRF Token -->
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            
+                            <!-- Basic Information Section -->
+                            <div class="form-section">
+                                <h2 class="section-title">Thông tin Cơ bản</h2>
+                                
+                                <div class="form-row">
+                                    <!-- Title Field -->
+                                    <div class="form-group">
+                                    <label for="bookTitleInput" class="form-label">Tên Sách *</label>
+                                    <input 
+                                        type="text" 
+                                        id="bookTitleInput" 
+                                        name="title" 
+                                        class="form-control" 
+                                        placeholder="Nhập tên đầy đủ của sách"
+                                        required
+                                        maxlength="200"
+                                    >
+                                </div>
+                                
+                                <!-- Author Field -->
+                                <div class="form-group">
+                                    <label for="bookAuthorInput" class="form-label">Tên Tác Giả *</label>
+                                    <input 
+                                        type="text" 
+                                        id="bookAuthorInput" 
+                                        name="author" 
+                                        class="form-control" 
+                                        placeholder="Nhập tên đầy đủ của tác giả"
+                                        required
+                                        maxlength="150"
+                                    >
+                                </div>
+                                
+                                <!-- ISBN Field -->
+                                <div class="form-group">
+                                    <label for="bookISBNInput" class="form-label">ISBN *</label>
+                                    <input 
+                                        type="text" 
+                                        id="bookISBNInput" 
+                                        name="isbn" 
+                                        class="form-control" 
+                                        placeholder="978-0-123456-78-9 or 0123456789"
+                                        required
+                                        pattern="^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$"
+                                    >
+                                    <small class="form-help">
+                                        Nhập mã ISBN 10 hoặc 13 chữ số có hoặc không có dấu gạch ngang
+                                    </small>
+                                </div>
+                            
+                            <!-- Classification Section -->
+                            <h3 class="section-title">Phân Loại</h3>
+                                
+                                <!-- Category Field -->
+                                <div class="form-group">
+                                    <label for="bookCategoryInput" class="form-label">Thể Loại *</label>
+                                    <select id="bookCategoryInput" name="category" class="form-control" required>
+                                        <option value="">Chọn thể loại</option>
+                                        <option value="Fiction">Tiểu thuyết</option>
+                                        <option value="Non-Fiction">Phê phẩm</option>
+                                        <option value="Classic Literature">Văn học cổ điển</option>
+                                        <option value="Science Fiction">Khoa học viễn tưởng</option>
+                                        <option value="Fantasy">Fantasy</option>
+                                        <option value="Mystery">Bí ẩn</option>
+                                        <option value="Romance">Lãng mạn</option>
+                                        <option value="Biography">Tiểu sử</option>
+                                        <option value="History">Lịch sử</option>
+                                        <option value="Science">Khoa học</option>
+                                        <option value="Technology">Công nghệ</option>
+                                        <option value="Philosophy">Triết học</option>
+                                        <option value="Poetry">Thơ</option>
+                                        <option value="Drama">Kịch</option>
+                                        <option value="Children's Books">Sách thiếu nhi</option>
+                                        <option value="Young Adult">Thiếu niên</option>
+                                        <option value="Educational">Giáo dục</option>
+                                        <option value="Reference">Tham khảo</option>
+                                        <option value="Self-Help">Tự giúp</option>
+                                        <option value="Other">Khác</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Publisher Field -->
+                                <div class="form-group">
+                                    <label for="bookPublisherInput" class="form-label">Nhà Xuất Bản</label>
+                                    <input 
+                                        type="text" 
+                                        id="bookPublisherInput" 
+                                        name="publisher" 
+                                        class="form-control" 
+                                        placeholder="Nhập tên nhà xuất bản"
+                                        maxlength="150"
+                                    >
+                                </div>
+                                
+                                <!-- Status Field (Librarian can manage status) -->
+                                <div class="form-group">
+                                    <label for="bookStatusSelect" class="form-label">Trạng Thái *</label>
+                                    <select id="bookStatusSelect" name="status" class="form-control" required>
+                                        <option value="available">Có sẵn</option>
+                                        <option value="borrowed">Đã mượn</option>
+                                        <option value="lost">Mất/Bảo trì</option>
+                                    </select>
+                                    <small class="form-help">
+                                        Thủ thư có thể cập nhật trạng thái sách thủ công
+                                    </small>
+                                </div>
+                            
+                            <!-- Description Section -->
+                            <h3 class="section-title">Mô Tả</h3>
+                                
+                                <div class="form-group">
+                                    <label for="bookDescriptionInput" class="form-label">Mô Tả Sách</label>
+                                    <textarea 
+                                        id="bookDescriptionInput" 
+                                        name="description" 
+                                        class="form-control" 
+                                        placeholder="Cung cấp mô tả ngắn gọn về nội dung, chủ đề hoặc tóm tắt cốt truyện của sách..."
+                                        rows="5"
+                                        maxlength="1000"
+                                    ></textarea>
+                                    <small class="form-help">
+                                        <span id="charCount">0</span>/1000 ký tự
+                                    </small>
+                                </div>
+                            
+                            <!-- Form Actions -->
+                            <div class="form-actions">
+                                <button type="button" id="cancelFormBtn" class="btn btn-outline">
+                                    Hủy
+                                </button>
+                                
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    Lưu Thông Tin
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Help Section -->
+                    <div class="card" style="margin-top: var(--spacing-xl);">
+                        <div class="card-header">
+                            <h3 class="card-title">Hướng Dẫn</h3>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-lg);">
+                            <div>
+                                <h4 style="color: var(--color-accent); margin-bottom: var(--spacing-sm);">Hướng Dẫn Tiêu Đề</h4>
+                                <ul style="margin: 0; padding-left: var(--spacing-lg); line-height: 1.6;">
+                                    <li>Bao gồm phụ đề nếu có</li>
+                                    <li>Sử dụng viết hoa đúng cách</li>
+                                    <li>Tránh viết tắt khi có thể</li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 style="color: var(--color-accent); margin-bottom: var(--spacing-sm);">Hướng Dẫn Tác Giả</h4>
+                                <ul style="margin: 0; padding-left: var(--spacing-lg); line-height: 1.6;">
+                                    <li>Sử dụng định dạng "Họ, Tên" cho một tác giả</li>
+                                    <li>Tách nhiều tác giả bằng dấu chấm phẩy</li>
+                                    <li>Bao gồm chữ cái đầu tên đệm nếu biết</li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 style="color: var(--color-accent); margin-bottom: var(--spacing-sm);">Mẹo Thể Loại</h4>
+                                <ul style="margin: 0; padding-left: var(--spacing-lg); line-height: 1.6;">
+                                    <li>Chọn thể loại cụ thể nhất</li>
+                                    <li>Xem xét đối tượng đọc giả</li>
+                                    <li>Sử dụng "Khác" cho thể loại độc đáo</li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 style="color: var(--color-accent); margin-bottom: var(--spacing-sm);">Thực Hành Tốt Cho Mô Tả</h4>
+                                <ul style="margin: 0; padding-left: var(--spacing-lg); line-height: 1.6;">
+                                    <li>Giữ ngắn gọn nhưng đầy đủ thông tin</li>
+                                    <li>Tránh tiết lộ nội dung quan trọng</li>
+                                    <li>Đề cập giải thưởng hoặc sự công nhận</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer style="background: var(--color-primary-btn); color: var(--color-background); text-align: center; padding: var(--spacing-xl) 0; margin-top: var(--spacing-xxl);">
+            <div class="container">
+                <p style="margin: 0; font-size: 0.9rem;">
+                    &copy; 2024 The Grand Library Management System
+                </p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- JavaScript -->
+    <!-- JavaScript Modules -->
+    <script src="/src/main/resources/static/js/utils.js"></script>
+    <script src="/src/main/resources/static/js/api-service.js"></script>
+    <script src="/src/main/resources/static/js/auth.js"></script>
+    <script src="/src/main/resources/static/js/book-management.js"></script>
+    
+    <!-- Page-specific JavaScript -->
+    <script>
+        // Initialize form on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!apiService.isAuthenticated()) {
+                window.location.href = '/src/main/resources/templates/auth-login.html';
+                return;
+            }
+            
+            // Check user permissions
+            const userRole = apiService.getUserRole();
+            if (!userRole || (!hasRole('LIBRARIAN') && !hasRole('ADMIN'))) {
+                showError('Bạn không có quyền thêm hoặc chỉnh sửa sách');
+                setTimeout(() => {
+                    window.location.href = '/src/main/resources/templates/index.html';
+                }, 2000);
+                return;
+            }
+            
+            // Initialize book management functionality
+            initializeBookManagement();
+            
+            // Setup cancel button
+            const cancelBtn = document.getElementById('cancelBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', cancelBookForm);
+            }
+            
+            // Setup form validation
+            setupFormValidation();
+        });
+        
+        // Setup real-time form validation
+        function setupFormValidation() {
+            const form = document.getElementById('bookForm');
+            const inputs = form.querySelectorAll('input, select, textarea');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+                
+                input.addEventListener('input', function() {
+                    clearFieldError(this);
+                });
+            });
+        }
+        
+        // Validate individual field
+        function validateField(field) {
+            const value = field.value.trim();
+            let isValid = true;
+            let message = '';
+            
+            switch(field.name) {
+                case 'title':
+                    if (!value) {
+                        isValid = false;
+                        message = 'Tiêu đề sách là bắt buộc';
+                    } else if (value.length < 2) {
+                        isValid = false;
+                        message = 'Tiêu đề phải có ít nhất 2 ký tự';
+                    }
+                    break;
+                    
+                case 'author':
+                    if (!value) {
+                        isValid = false;
+                        message = 'Tác giả là bắt buộc';
+                    } else if (value.length < 2) {
+                        isValid = false;
+                        message = 'Tên tác giả phải có ít nhất 2 ký tự';
+                    }
+                    break;
+                    
+                case 'category':
+                    if (!value) {
+                        isValid = false;
+                        message = 'Thể loại là bắt buộc';
+                    }
+                    break;
+            }
+            
+            if (!isValid) {
+                showFieldError(field, message);
+            } else {
+                clearFieldError(field);
+            }
+            
+            return isValid;
+        }
+        
+        // Show field-specific error
+        function showFieldError(field, message) {
+            field.style.borderColor = 'var(--color-borrowed)';
+            
+            // Remove existing error message
+            const existingError = field.parentNode.querySelector('.field-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // Add new error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'field-error';
+            errorDiv.style.cssText = `
+                color: var(--color-borrowed);
+                font-size: 0.8rem;
+                margin-top: 5px;
+            `;
+            errorDiv.textContent = message;
+            field.parentNode.appendChild(errorDiv);
+        }
+        
+        // Clear field error
+        function clearFieldError(field) {
+            field.style.borderColor = '';
+            const errorDiv = field.parentNode.querySelector('.field-error');
+            if (errorDiv) {
+                errorDiv.remove();
+            }
+        }
+    </script>
+        
+        function initializeEditMode(bookId) {
+            // Update page title and heading
+            document.title = 'Edit Book - The Grand Library';
+            document.getElementById('formTitle').innerHTML = 'Chỉnh sửa Sách';
+            document.querySelector('.card-subtitle').textContent = 'Update the information for this book';
+            
+            // Find book data
+            const book = BOOKS_DATA.find(b => b.id === bookId);
+            if (!book) {
+                showNotification('Book not found. Redirecting...', 'error');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+                return;
+            }
+            
+            // Populate form fields
+            document.getElementById('bookId').value = book.id;
+            document.getElementById('bookTitleInput').value = book.title;
+            document.getElementById('bookAuthorInput').value = book.author;
+            document.getElementById('bookISBNInput').value = book.isbn;
+            document.getElementById('bookCategoryInput').value = book.category;
+            document.getElementById('bookPublisherInput').value = book.publisher || '';
+            document.getElementById('bookDescriptionInput').value = book.description || '';
+            document.getElementById('bookStatusSelect').value = book.status;
+            
+            // Update character counter
+            updateCharacterCounter();
+            
+            // Update submit button text
+            document.querySelector('button[type="submit"]').innerHTML = 'Update Record';
+        }
+        
+        function initializeAddMode() {
+            // Set default values for new book
+            document.getElementById('bookStatusSelect').value = 'available';
+        }
+        
+        function setupFormSubmission() {
+            const form = document.getElementById('bookForm');
+            
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Collect form data
+                const formData = new FormData(form);
+                const bookData = {
+                    title: formData.get('title').trim(),
+                    author: formData.get('author').trim(),
+                    isbn: formData.get('isbn').trim(),
+                    category: formData.get('category'),
+                    publisher: formData.get('publisher').trim() || 'Unknown Publisher',
+                    description: formData.get('description').trim() || 'No description available.',
+                    status: formData.get('status')
+                };
+                
+                // Validate form
+                if (!validateBookData(bookData)) {
+                    return;
+                }
+                
+                // Show loading state
+                showLoadingState(form);
+                
+                // Simulate API call
+                setTimeout(() => {
+                    if (isEditMode) {
+                        updateBook(currentBookId, bookData);
+                    } else {
+                        addNewBook(bookData);
+                    }
+                }, 1500);
+            });
+        }
+        
+        function addNewBook(bookData) {
+            // Generate new ID
+            const newId = Math.max(...BOOKS_DATA.map(b => b.id)) + 1;
+            
+            const newBook = {
+                id: newId,
+                ...bookData,
+                borrowHistory: []
+            };
+            
+            // Add to mock data
+            BOOKS_DATA.push(newBook);
+            
+            showNotification(`"${bookData.title}" has been successfully added to the library!`, 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+        
+        function updateBook(bookId, bookData) {
+            // Find and update book
+            const bookIndex = BOOKS_DATA.findIndex(b => b.id === bookId);
+            
+            if (bookIndex !== -1) {
+                // Preserve borrowing history
+                const borrowHistory = BOOKS_DATA[bookIndex].borrowHistory;
+                
+                BOOKS_DATA[bookIndex] = {
+                    id: bookId,
+                    ...bookData,
+                    borrowHistory: borrowHistory
+                };
+                
+                showNotification(`"${bookData.title}" has been successfully updated!`, 'success');
+                
+                setTimeout(() => {
+                    window.location.href = `book-detail.html?id=${bookId}`;
+                }, 2000);
+            } else {
+                showNotification('Error: Book not found for update.', 'error');
+            }
+        }
+        
+        function validateBookData(bookData) {
+            let isValid = true;
+            
+            // Clear previous errors
+            clearFormErrors();
+            
+            // Title validation
+            if (!bookData.title || bookData.title.length < 2) {
+                showFieldError('title', 'Book title must be at least 2 characters long');
+                isValid = false;
+            }
+            
+            // Author validation
+            if (!bookData.author || bookData.author.length < 2) {
+                showFieldError('author', 'Author name must be at least 2 characters long');
+                isValid = false;
+            }
+            
+            // ISBN validation
+            if (!bookData.isbn || !isValidISBN(bookData.isbn)) {
+                showFieldError('isbn', 'Please enter a valid ISBN (10 or 13 digits)');
+                isValid = false;
+            }
+            
+            // Category validation
+            if (!bookData.category) {
+                showFieldError('category', 'Please select a category');
+                isValid = false;
+            }
+            
+            // Status validation
+            if (!bookData.status) {
+                showFieldError('status', 'Please select a status');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        function setupCharacterCounter() {
+            const textarea = document.getElementById('bookDescriptionInput');
+            const counter = document.getElementById('charCount');
+            
+            textarea.addEventListener('input', updateCharacterCounter);
+        }
+        
+        function updateCharacterCounter() {
+            const textarea = document.getElementById('bookDescriptionInput');
+            const counter = document.getElementById('charCount');
+            const currentLength = textarea.value.length;
+            
+            counter.textContent = currentLength;
+            
+            if (currentLength > 900) {
+                counter.style.color = 'var(--color-borrowed)';
+            } else if (currentLength > 700) {
+                counter.style.color = 'var(--color-accent)';
+            } else {
+                counter.style.color = 'var(--color-available)';
+            }
+        }
+        
+        function setupFormValidation() {
+            const form = document.getElementById('bookForm');
+            const inputs = form.querySelectorAll('.form-control');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.checkValidity() && this.value.trim()) {
+                        this.style.borderColor = 'var(--color-available)';
+                        clearFieldError(this.name);
+                    }
+                });
+                
+                input.addEventListener('input', function() {
+                    if (this.style.borderColor === 'rgb(191, 54, 12)') { // error color
+                        this.style.borderColor = 'var(--color-accent)';
+                    }
+                });
+            });
+            
+            // Real-time ISBN validation
+            const isbnInput = document.getElementById('bookISBNInput');
+            isbnInput.addEventListener('input', function() {
+                const isbn = this.value.replace(/[-\s]/g, '');
+                
+                if (isbn.length >= 10) {
+                    if (isValidISBN(this.value)) {
+                        this.style.borderColor = 'var(--color-available)';
+                        clearFieldError('isbn');
+                    } else {
+                        this.style.borderColor = 'var(--color-borrowed)';
+                    }
+                }
+            });
+        }
+        
+        // Cancel button functionality
+        document.getElementById('cancelBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+                window.location.href = 'index.html';
+            }
+        });
+        
+        document.getElementById('cancelFormBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Ctrl/Cmd + S to save
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                document.getElementById('bookForm').requestSubmit();
+            }
+            
+            // Escape to cancel
+            if (event.key === 'Escape') {
+                if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+                    window.location.href = 'index.html';
+                }
+            }
+        });
+        
+        // Add entrance animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.querySelector('.card');
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease-out';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200);
+            }
+        });
+        
+        // Focus first input
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const firstInput = document.getElementById('bookTitleInput');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }, 300);
+        });
+    </script>
+</body>
+</html>
