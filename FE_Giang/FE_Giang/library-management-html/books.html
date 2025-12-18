@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Sách - Bibliotheca Library</title>
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="./assets/css/variables.css">
+  <link rel="stylesheet" href="./assets/css/global.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/responsive.css">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="layout">
+    <div class="layout-content" id="layoutContent">
+      <main class="main-content">
+        <div class="content-header">
+          <div class="content-header-top">
+            <h2 class="content-title">Quản Lý Sách</h2>
+            <div class="content-actions">
+              <button class="btn btn-primary" onclick="openBookModal()" data-role-required="LIBRARIAN">
+                <i class="fas fa-plus"></i>
+                Thêm sách mới
+              </button>
+            </div>
+          </div>
+          <p class="content-description">Quản lý danh sách sách trong thư viện</p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row">
+              <div class="col col-md-6">
+                <div class="search-box">
+                  <i class="fas fa-search search-icon"></i>
+                  <input 
+                    type="text" 
+                    class="search-input form-control" 
+                    id="searchInput" 
+                    placeholder="Tìm kiếm theo tên, tác giả, ISBN..."
+                  >
+                </div>
+              </div>
+              <div class="col col-md-3">
+                <select class="form-control" id="categoryFilter">
+                  <option value="all">Tất cả thể loại</option>
+                </select>
+              </div>
+              <div class="col col-md-3">
+                <select class="form-control" id="sortBy">
+                  <option value="title">Sắp xếp: Tên A-Z</option>
+                  <option value="author">Sắp xếp: Tác giả</option>
+                  <option value="year">Sắp xếp: Năm xuất bản</option>
+                  <option value="available">Sắp xếp: Số lượng</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Books Table -->
+        <div class="card">
+          <div class="card-body">
+            <div id="booksTable">
+              ${Components.getLoadingHTML()}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Book Modal -->
+  <div class="modal-backdrop" id="bookModal-backdrop"></div>
+  <div class="modal" id="bookModal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Thêm sách mới</h3>
+      <button class="modal-close" onclick="closeBookModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="bookForm">
+        <input type="hidden" id="bookId">
+        
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="title" class="form-label required">Tên sách</label>
+              <input type="text" id="title" class="form-control" required>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="author" class="form-label required">Tác giả</label>
+              <input type="text" id="author" class="form-control" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="isbn" class="form-label required">ISBN</label>
+              <input type="text" id="isbn" class="form-control" placeholder="978-0-123456-78-9" required>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="category" class="form-label required">Thể loại</label>
+              <input type="text" id="category" class="form-control" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="publisher" class="form-label required">Nhà xuất bản</label>
+              <input type="text" id="publisher" class="form-control" required>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="publishedYear" class="form-label required">Năm xuất bản</label>
+              <input type="number" id="publishedYear" class="form-control" min="1900" max="2100" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="quantity" class="form-label required">Số lượng</label>
+              <input type="number" id="quantity" class="form-control" min="0" required>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="available" class="form-label required">Có sẵn</label>
+              <input type="number" id="available" class="form-control" min="0" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description" class="form-label">Mô tả</label>
+          <textarea id="description" class="form-control" rows="3"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeBookModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveBook()">
+        <i class="fas fa-save"></i>
+        Lưu
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  <script src="./assets/js/components.js"></script>
+  
+  <script>
+    // Protect page - require authentication
+    if (!protectPage()) {
+      throw new Error('Unauthorized');
+    }
+
+    // State
+    let allBooks = [];
+    let filteredBooks = [];
+    let currentEditingBook = null;
+
+    // Initialize page
+    async function initBooks() {
+      try {
+        // Insert sidebar and header
+        const sidebarHTML = Components.getSidebarHTML();
+        const headerHTML = Components.getHeaderHTML('Quản Lý Sách', [
+          { text: 'Trang chủ', href: '/dashboard.html' },
+          { text: 'Quản lý sách' }
+        ]);
+
+        document.querySelector('.layout').insertAdjacentHTML('afterbegin', sidebarHTML);
+        document.getElementById('layoutContent').insertAdjacentHTML('afterbegin', headerHTML);
+
+        // Initialize components
+        Components.initSidebar();
+        Components.initHeader();
+        Auth.init();
+        Auth.setupLogoutButtons();
+
+        // Setup event listeners
+        setupEventListeners();
+
+        // Load books
+        await loadBooks();
+
+      } catch (error) {
+        console.error('Books init error:', error);
+        Toast.error('Không thể tải dữ liệu');
+      }
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Search
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', Utils.debounce(() => {
+        filterAndRenderBooks();
+      }, 300));
+
+      // Category filter
+      document.getElementById('categoryFilter').addEventListener('change', filterAndRenderBooks);
+
+      // Sort
+      document.getElementById('sortBy').addEventListener('change', filterAndRenderBooks);
+    }
+
+    // Load books from API
+    async function loadBooks() {
+      try {
+        Loading.show();
+        allBooks = await BooksAPI.getAll();
+        filteredBooks = [...allBooks];
+        
+        // Populate category filter
+        populateCategoryFilter();
+        
+        // Render books
+        renderBooks();
+        
+        Loading.hide();
+      } catch (error) {
+        Loading.hide();
+        console.error('Load books error:', error);
+        Toast.error(error.message);
+      }
+    }
+
+    // Populate category filter
+    function populateCategoryFilter() {
+      const categories = BooksAPI.getCategories(allBooks);
+      const filterSelect = document.getElementById('categoryFilter');
+      
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        filterSelect.appendChild(option);
+      });
+    }
+
+    // Filter and render books
+    function filterAndRenderBooks() {
+      const searchQuery = document.getElementById('searchInput').value;
+      const category = document.getElementById('categoryFilter').value;
+      const sortBy = document.getElementById('sortBy').value;
+
+      // Filter
+      filteredBooks = BooksAPI.search(allBooks, searchQuery);
+      filteredBooks = BooksAPI.filterByCategory(filteredBooks, category);
+
+      // Sort
+      sortBooks(filteredBooks, sortBy);
+
+      // Render
+      renderBooks();
+    }
+
+    // Sort books
+    function sortBooks(books, sortBy) {
+      books.sort((a, b) => {
+        switch(sortBy) {
+          case 'title':
+            return a.title.localeCompare(b.title);
+          case 'author':
+            return a.author.localeCompare(b.author);
+          case 'year':
+            return (b.publishedYear || 0) - (a.publishedYear || 0);
+          case 'available':
+            return (b.available || 0) - (a.available || 0);
+          default:
+            return 0;
+        }
+      });
+    }
+
+    // Render books table
+    function renderBooks() {
+      const container = document.getElementById('booksTable');
+
+      if (filteredBooks.length === 0) {
+        container.innerHTML = Components.getEmptyStateHTML({
+          icon: 'fas fa-book',
+          title: 'Không tìm thấy sách',
+          message: 'Không có sách nào phù hợp với bộ lọc của bạn'
+        });
+        return;
+      }
+
+      const canEdit = Auth.hasRole('LIBRARIAN');
+
+      const tableHTML = `
+        <div class="table-container table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên sách</th>
+                <th>Tác giả</th>
+                <th>ISBN</th>
+                <th>Thể loại</th>
+                <th>Năm XB</th>
+                <th>Số lượng</th>
+                <th>Có sẵn</th>
+                ${canEdit ? '<th>Thao tác</th>' : ''}
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredBooks.map(book => `
+                <tr>
+                  <td>${book.id}</td>
+                  <td>
+                    <strong>${Utils.escapeHtml(book.title)}</strong>
+                    ${book.description ? `<br><small class="text-secondary">${Utils.truncate(book.description, 50)}</small>` : ''}
+                  </td>
+                  <td>${Utils.escapeHtml(book.author)}</td>
+                  <td><code>${Utils.escapeHtml(book.isbn)}</code></td>
+                  <td><span class="badge badge-primary">${Utils.escapeHtml(book.category)}</span></td>
+                  <td>${book.publishedYear}</td>
+                  <td>${book.quantity}</td>
+                  <td>
+                    ${book.available > 0 
+                      ? `<span class="badge badge-success">${book.available}</span>` 
+                      : '<span class="badge badge-warning">0</span>'
+                    }
+                  </td>
+                  ${canEdit ? `
+                    <td>
+                      <div class="table-actions">
+                        <button class="btn btn-sm btn-outline" onclick="viewBook(${book.id})" title="Xem chi tiết">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="editBook(${book.id})" title="Sửa">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.id})" title="Xóa">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  ` : ''}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      container.innerHTML = tableHTML;
+    }
+
+    // Open book modal (for create)
+    function openBookModal() {
+      if (!Auth.hasRole('LIBRARIAN')) {
+        Toast.error('Bạn không có quyền thêm sách');
+        return;
+      }
+
+      currentEditingBook = null;
+      document.getElementById('modalTitle').textContent = 'Thêm sách mới';
+      document.getElementById('bookForm').reset();
+      document.getElementById('bookId').value = '';
+      Modal.show('bookModal');
+    }
+
+    // Close book modal
+    function closeBookModal() {
+      Modal.hide('bookModal');
+      currentEditingBook = null;
+      Validator.clearAllErrors(document.getElementById('bookForm'));
+    }
+
+    // View book details
+    function viewBook(id) {
+      const book = allBooks.find(b => b.id === id);
+      if (!book) return;
+
+      const message = `
+        <div style="text-align: left;">
+          <p><strong>Tên sách:</strong> ${book.title}</p>
+          <p><strong>Tác giả:</strong> ${book.author}</p>
+          <p><strong>ISBN:</strong> ${book.isbn}</p>
+          <p><strong>Nhà xuất bản:</strong> ${book.publisher}</p>
+          <p><strong>Năm xuất bản:</strong> ${book.publishedYear}</p>
+          <p><strong>Thể loại:</strong> ${book.category}</p>
+          <p><strong>Số lượng:</strong> ${book.quantity}</p>
+          <p><strong>Có sẵn:</strong> ${book.available}</p>
+          ${book.description ? `<p><strong>Mô tả:</strong> ${book.description}</p>` : ''}
+        </div>
+      `;
+
+      Toast.info(message, 8000);
+    }
+
+    // Edit book
+    function editBook(id) {
+      if (!Auth.hasRole('LIBRARIAN')) {
+        Toast.error('Bạn không có quyền sửa sách');
+        return;
+      }
+
+      const book = allBooks.find(b => b.id === id);
+      if (!book) return;
+
+      currentEditingBook = book;
+      document.getElementById('modalTitle').textContent = 'Chỉnh sửa sách';
+      
+      // Fill form
+      document.getElementById('bookId').value = book.id;
+      document.getElementById('title').value = book.title;
+      document.getElementById('author').value = book.author;
+      document.getElementById('isbn').value = book.isbn;
+      document.getElementById('category').value = book.category;
+      document.getElementById('publisher').value = book.publisher;
+      document.getElementById('publishedYear').value = book.publishedYear;
+      document.getElementById('quantity').value = book.quantity;
+      document.getElementById('available').value = book.available;
+      document.getElementById('description').value = book.description || '';
+
+      Modal.show('bookModal');
+    }
+
+    // Save book (create or update)
+    async function saveBook() {
+      const form = document.getElementById('bookForm');
+      Validator.clearAllErrors(form);
+
+      // Validate
+      let isValid = true;
+      if (!Validator.validateRequired(document.getElementById('title'), 'Tên sách')) isValid = false;
+      if (!Validator.validateRequired(document.getElementById('author'), 'Tác giả')) isValid = false;
+      if (!Validator.validateRequired(document.getElementById('isbn'), 'ISBN')) isValid = false;
+      if (!Validator.validateRequired(document.getElementById('category'), 'Thể loại')) isValid = false;
+      if (!Validator.validateRequired(document.getElementById('publisher'), 'Nhà xuất bản')) isValid = false;
+      if (!Validator.validateNumber(document.getElementById('publishedYear'), 'Năm xuất bản')) isValid = false;
+      if (!Validator.validateNumber(document.getElementById('quantity'), 'Số lượng')) isValid = false;
+      if (!Validator.validateNumber(document.getElementById('available'), 'Có sẵn')) isValid = false;
+
+      if (!isValid) return;
+
+      // Get form data
+      const bookData = {
+        title: document.getElementById('title').value.trim(),
+        author: document.getElementById('author').value.trim(),
+        isbn: document.getElementById('isbn').value.trim(),
+        category: document.getElementById('category').value.trim(),
+        publisher: document.getElementById('publisher').value.trim(),
+        publishedYear: parseInt(document.getElementById('publishedYear').value),
+        quantity: parseInt(document.getElementById('quantity').value),
+        available: parseInt(document.getElementById('available').value),
+        description: document.getElementById('description').value.trim()
+      };
+
+      try {
+        Loading.show();
+
+        if (currentEditingBook) {
+          // Update
+          await BooksAPI.update(currentEditingBook.id, bookData);
+          Toast.success('Cập nhật sách thành công!');
+        } else {
+          // Create
+          await BooksAPI.create(bookData);
+          Toast.success('Thêm sách mới thành công!');
+        }
+
+        closeBookModal();
+        await loadBooks();
+
+        Loading.hide();
+      } catch (error) {
+        Loading.hide();
+        console.error('Save book error:', error);
+        Toast.error(error.message);
+      }
+    }
+
+    // Delete book
+    function deleteBook(id) {
+      if (!Auth.hasRole('LIBRARIAN')) {
+        Toast.error('Bạn không có quyền xóa sách');
+        return;
+      }
+
+      const book = allBooks.find(b => b.id === id);
+      if (!book) return;
+
+      Modal.confirm(
+        'Xác nhận xóa',
+        `Bạn có chắc chắn muốn xóa sách "${book.title}"?`,
+        async () => {
+          try {
+            Loading.show();
+            await BooksAPI.delete(id);
+            Toast.success('Xóa sách thành công!');
+            await loadBooks();
+            Loading.hide();
+          } catch (error) {
+            Loading.hide();
+            console.error('Delete book error:', error);
+            Toast.error(error.message);
+          }
+        }
+      );
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initBooks);
+  </script>
+</body>
+</html>

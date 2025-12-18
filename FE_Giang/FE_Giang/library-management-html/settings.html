@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cài Đặt - Bibliotheca Library</title>
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="./assets/css/variables.css">
+  <link rel="stylesheet" href="./assets/css/global.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/responsive.css">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="layout">
+    <div class="layout-content" id="layoutContent">
+      <main class="main-content">
+        <div class="content-header">
+          <div class="content-header-top">
+            <h2 class="content-title">Cài Đặt</h2>
+          </div>
+          <p class="content-description">Quản lý thông tin cá nhân và tùy chỉnh hệ thống</p>
+        </div>
+
+        <div class="row">
+          <!-- Profile Information -->
+          <div class="col col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Thông Tin Cá Nhân</h3>
+              </div>
+              <div class="card-body">
+                <form id="profileForm">
+                  <div class="form-group">
+                    <label for="name" class="form-label required">Họ và tên</label>
+                    <input type="text" id="name" class="form-control" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="email" class="form-label required">Email</label>
+                    <input type="email" id="email" class="form-control" required disabled>
+                    <span class="form-text">Email không thể thay đổi</span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="role" class="form-label">Vai trò</label>
+                    <input type="text" id="role" class="form-control" disabled>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Lưu thay đổi
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Change Password -->
+          <div class="col col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Đổi Mật Khẩu</h3>
+              </div>
+              <div class="card-body">
+                <form id="passwordForm">
+                  <div class="form-group">
+                    <label for="currentPassword" class="form-label required">Mật khẩu hiện tại</label>
+                    <input type="password" id="currentPassword" class="form-control" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="newPassword" class="form-label required">Mật khẩu mới</label>
+                    <input type="password" id="newPassword" class="form-control" required minlength="6">
+                    <span class="form-text">Tối thiểu 6 ký tự</span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="confirmPassword" class="form-label required">Xác nhận mật khẩu mới</label>
+                    <input type="password" id="confirmPassword" class="form-control" required>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-key"></i>
+                    Đổi mật khẩu
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Preferences -->
+        <div class="row">
+          <div class="col col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Tùy Chỉnh Hệ Thống</h3>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col col-md-6">
+                    <div class="form-group">
+                      <label for="language" class="form-label">Ngôn ngữ</label>
+                      <select id="language" class="form-control">
+                        <option value="vi" selected>Tiếng Việt</option>
+                        <option value="en">English</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col col-md-6">
+                    <div class="form-group">
+                      <label for="theme" class="form-label">Giao diện</label>
+                      <select id="theme" class="form-control">
+                        <option value="light" selected>Sáng</option>
+                        <option value="dark">Tối</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-check">
+                  <input type="checkbox" id="notifications" class="form-check-input" checked>
+                  <label for="notifications" class="form-check-label">
+                    Nhận thông báo từ hệ thống
+                  </label>
+                </div>
+
+                <div class="form-check">
+                  <input type="checkbox" id="emailNotifications" class="form-check-input" checked>
+                  <label for="emailNotifications" class="form-check-label">
+                    Nhận thông báo qua email
+                  </label>
+                </div>
+
+                <button class="btn btn-primary mt-3" onclick="savePreferences()">
+                  <i class="fas fa-save"></i>
+                  Lưu cài đặt
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- About -->
+        <div class="row">
+          <div class="col col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Về Hệ Thống</h3>
+              </div>
+              <div class="card-body">
+                <div style="text-align: center; padding: 2rem;">
+                  <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
+                  <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">Bibliotheca</h2>
+                  <p style="color: var(--text-secondary); margin-bottom: 2rem;">Vintage Library Management System</p>
+                  
+                  <div style="display: inline-block; text-align: left;">
+                    <p><strong>Phiên bản:</strong> 1.0.0</p>
+                    <p><strong>Ngày phát hành:</strong> December 2025</p>
+                    <p><strong>Backend API:</strong> <code>http://localhost:8086</code></p>
+                    <p><strong>Công nghệ:</strong> HTML, CSS, JavaScript, Chart.js</p>
+                  </div>
+
+                  <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                    <p style="color: var(--text-light);">&copy; 2025 Bibliotheca. All rights reserved.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  <script src="./assets/js/components.js"></script>
+  
+  <script>
+    // Protect page
+    if (!protectPage()) {
+      throw new Error('Unauthorized');
+    }
+
+    // Initialize page
+    async function initSettings() {
+      try {
+        // Insert sidebar and header
+        const sidebarHTML = Components.getSidebarHTML();
+        const headerHTML = Components.getHeaderHTML('Cài Đặt', [
+          { text: 'Trang chủ', href: '/dashboard.html' },
+          { text: 'Cài đặt' }
+        ]);
+
+        document.querySelector('.layout').insertAdjacentHTML('afterbegin', sidebarHTML);
+        document.getElementById('layoutContent').insertAdjacentHTML('afterbegin', headerHTML);
+
+        // Initialize components
+        Components.initSidebar();
+        Components.initHeader();
+        Auth.init();
+        Auth.setupLogoutButtons();
+
+        // Load user profile
+        await loadProfile();
+
+        // Setup forms
+        setupForms();
+
+      } catch (error) {
+        console.error('Settings init error:', error);
+        Toast.error('Không thể tải dữ liệu');
+      }
+    }
+
+    // Load user profile
+    async function loadProfile() {
+      try {
+        const user = Auth.getCurrentUser();
+        
+        if (user) {
+          document.getElementById('name').value = user.name || '';
+          document.getElementById('email').value = user.email || '';
+          document.getElementById('role').value = user.role || 'GUEST';
+        }
+
+      } catch (error) {
+        console.error('Load profile error:', error);
+      }
+    }
+
+    // Setup forms
+    function setupForms() {
+      // Profile form
+      document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const nameInput = document.getElementById('name');
+        
+        if (!Validator.validateRequired(nameInput, 'Họ và tên')) {
+          return;
+        }
+
+        Toast.info('Chức năng cập nhật profile chưa được implement ở backend');
+        
+        // Uncomment when API is ready:
+        // try {
+        //   Loading.show();
+        //   await AuthAPI.updateProfile({ name: nameInput.value });
+        //   await Auth.refreshProfile();
+        //   Toast.success('Cập nhật thông tin thành công!');
+        //   Loading.hide();
+        // } catch (error) {
+        //   Loading.hide();
+        //   Toast.error(error.message);
+        // }
+      });
+
+      // Password form
+      document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('currentPassword');
+        const newPassword = document.getElementById('newPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+
+        Validator.clearAllErrors(e.target);
+
+        let isValid = true;
+        if (!Validator.validateRequired(currentPassword, 'Mật khẩu hiện tại')) isValid = false;
+        if (!Validator.validateMinLength(newPassword, 6, 'Mật khẩu mới')) isValid = false;
+        if (!Validator.validateMatch(newPassword, confirmPassword, 'Mật khẩu')) isValid = false;
+
+        if (!isValid) return;
+
+        Toast.info('Chức năng đổi mật khẩu chưa được implement ở backend');
+
+        // Uncomment when API is ready:
+        // try {
+        //   Loading.show();
+        //   await AuthAPI.changePassword({
+        //     currentPassword: currentPassword.value,
+        //     newPassword: newPassword.value
+        //   });
+        //   Toast.success('Đổi mật khẩu thành công!');
+        //   e.target.reset();
+        //   Loading.hide();
+        // } catch (error) {
+        //   Loading.hide();
+        //   Toast.error(error.message);
+        // }
+      });
+    }
+
+    // Save preferences
+    function savePreferences() {
+      const language = document.getElementById('language').value;
+      const theme = document.getElementById('theme').value;
+      const notifications = document.getElementById('notifications').checked;
+      const emailNotifications = document.getElementById('emailNotifications').checked;
+
+      // Save to localStorage
+      Storage.set('preferences', {
+        language,
+        theme,
+        notifications,
+        emailNotifications
+      });
+
+      Toast.success('Đã lưu cài đặt thành công!');
+      
+      // Apply theme (simple implementation)
+      if (theme === 'dark') {
+        Toast.info('Giao diện tối sẽ được áp dụng trong phiên bản tiếp theo');
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initSettings);
+  </script>
+</body>
+</html>

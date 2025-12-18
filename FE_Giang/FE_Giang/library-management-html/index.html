@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bibliotheca - Vintage Library Management System">
+  <title>Đăng Nhập - Bibliotheca Library</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="./assets/css/variables.css">
+  <link rel="stylesheet" href="./assets/css/global.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/responsive.css">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* Login Page Specific Styles */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-lg);
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+
+    .login-card {
+      position: relative;
+      width: 100%;
+      max-width: 450px;
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-2xl);
+      overflow: hidden;
+    }
+
+    .login-header {
+      text-align: center;
+      padding: var(--space-2xl) var(--space-xl) var(--space-xl);
+      background: linear-gradient(180deg, var(--surface-dark) 0%, var(--surface) 100%);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .login-logo {
+      font-size: 4rem;
+      margin-bottom: var(--space-md);
+      display: block;
+    }
+
+    .login-title {
+      font-size: var(--font-size-3xl);
+      color: var(--primary-color);
+      margin-bottom: var(--space-xs);
+    }
+
+    .login-subtitle {
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+      font-family: var(--font-family-secondary);
+    }
+
+    .login-body {
+      padding: var(--space-xl);
+    }
+
+    .login-footer {
+      padding: var(--space-lg) var(--space-xl);
+      text-align: center;
+      background-color: var(--surface-dark);
+      border-top: 1px solid var(--border-color);
+    }
+
+    .login-footer p {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 38px;
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 8px;
+      font-size: var(--font-size-base);
+      z-index: 10;
+      line-height: 1;
+    }
+
+    .password-toggle:hover {
+      color: var(--primary-color);
+    }
+
+    .form-group-password {
+      position: relative;
+    }
+
+    .form-group-password .form-control {
+      padding-right: 45px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: var(--space-xl) 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .divider span {
+      padding: 0 var(--space-md);
+      color: var(--text-light);
+      font-size: var(--font-size-sm);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <span class="login-logo">📚</span>
+        <h1 class="login-title">Bibliotheca</h1>
+        <p class="login-subtitle">Vintage Library Management System</p>
+      </div>
+
+      <div class="login-body">
+        <!-- Login Form -->
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="email" class="form-label required">Email</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              class="form-control" 
+              placeholder="your.email@example.com"
+              required
+              autocomplete="email"
+            >
+          </div>
+
+          <div class="form-group form-group-password">
+            <label for="password" class="form-label required">Mật khẩu</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="form-control" 
+              placeholder="••••••••"
+              required
+              autocomplete="current-password"
+            >
+            <button type="button" class="password-toggle" id="togglePassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+
+          <div class="form-check">
+            <input type="checkbox" id="remember" class="form-check-input">
+            <label for="remember" class="form-check-label">Ghi nhớ đăng nhập</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block mt-3">
+            <i class="fas fa-sign-in-alt"></i>
+            Đăng nhập
+          </button>
+        </form>
+
+        <div class="divider">
+          <span>hoặc</span>
+        </div>
+
+        <button type="button" class="btn btn-outline btn-block" id="registerBtn">
+          <i class="fas fa-user-plus"></i>
+          Đăng ký tài khoản mới
+        </button>
+      </div>
+
+      <div class="login-footer">
+        <p>&copy; 2025 Bibliotheca. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  
+  <script>
+    // Redirect if already authenticated
+    redirectIfAuthenticated();
+
+    // Get form elements
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const registerBtn = document.getElementById('registerBtn');
+
+    // Toggle password visibility
+    togglePasswordBtn.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      
+      const icon = togglePasswordBtn.querySelector('i');
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+    });
+
+    // Handle login form submission
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Validate form
+      Validator.clearAllErrors(loginForm);
+      
+      let isValid = true;
+      if (!Validator.validateEmail(emailInput)) isValid = false;
+      if (!Validator.validateMinLength(passwordInput, 6, 'Mật khẩu')) isValid = false;
+
+      if (!isValid) return;
+
+      // Get form data
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      try {
+        // Call login API
+        const response = await Auth.login(email, password);
+        
+        console.log('Login response:', response);
+        console.log('Token saved:', localStorage.getItem('token'));
+        console.log('User saved:', localStorage.getItem('currentUser'));
+        console.log('Is authenticated after login:', Auth.isAuthenticated());
+
+        // Verify token was saved before redirecting
+        if (!Auth.isAuthenticated()) {
+          console.error('Authentication failed: Token not saved properly');
+          Toast.error('Lỗi xác thực. Vui lòng thử lại!');
+          return;
+        }
+
+        // Redirect to dashboard
+        window.location.href = './dashboard.html';
+
+      } catch (error) {
+        console.error('Login failed:', error);
+        Toast.error(error.message || 'Đăng nhập thất bại');
+      }
+    });
+
+    // Register button
+    if (registerBtn) {
+      registerBtn.addEventListener('click', () => {
+        window.location.href = './register.html';
+      });
+    }
+
+    // Auto-fill demo credentials (for testing - remove in production)
+    document.addEventListener('keydown', (e) => {
+      if (e.altKey && e.key === 'a') {
+        emailInput.value = 'admin@library.com';
+        passwordInput.value = 'admin123';
+        Toast.info('Đã điền thông tin Admin');
+      }
+      if (e.altKey && e.key === 'l') {
+        emailInput.value = 'librarian@library.com';
+        passwordInput.value = 'lib123';
+        Toast.info('Đã điền thông tin Librarian');
+      }
+      if (e.altKey && e.key === 'u') {
+        emailInput.value = 'user@library.com';
+        passwordInput.value = 'user123';
+        Toast.info('Đã điền thông tin User');
+      }
+    });
+  </script>
+</body>
+</html>

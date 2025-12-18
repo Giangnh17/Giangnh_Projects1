@@ -26,26 +26,23 @@
                         Trang web Quản lý thư viện sách Sarly
                     </a>
                     
-                    <!-- User Info and Actions -->
+                    <!-- User Information -->
                     <div class="navbar-nav">
-                        <!-- User Information -->
                         <div class="user-info">
                             <div class="user-avatar">
-                                <span th:text="${#authentication.name != null ? #authentication.name.substring(0,1).toUpperCase() : 'U'}">U</span>
+                                <span id="userInitial">U</span>
                             </div>
-                            <div>
-                                <div class="user-name" th:text="${#authentication.name ?: 'Demo User'}">Demo User</div>
-                                <div style="font-size: 0.8rem; color: rgba(245, 241, 230, 0.8);" th:text="${#authorization.hasRole('LIBRARIAN') ? 'Librarian' : 'Viewer'}">Viewer</div>
+                            <div class="user-details">
+                                <div class="user-name" id="userName">Người dùng</div>
+                                <div class="user-role" id="userRole">Đang tải...</div>
                             </div>
                         </div>
                         
-                        <!-- Nút đăng xuất -->
-                        <form th:action="@{/logout}" method="post" style="display: inline;">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                            <button type="submit" class="btn btn-outline" style="border-color: rgba(245, 241, 230, 0.5); color: var(--color-background);">
-                                Đăng xuất
-                            </button>
-                        </form>
+                        <!-- Logout Button -->
+                        <button onclick="logout()" class="btn btn-outline logout-btn">
+                            <span>🚪</span>
+                            <span>Đăng xuất</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -55,34 +52,11 @@
         <aside class="sidebar">
             <nav class="sidebar-nav">
                 <ul class="nav-list">
+                    <!-- Dynamic content will be loaded by JavaScript -->
                     <li class="nav-item active">
-                        <a href="/src/main/resources/templates/index.html" class="nav-link">
+                        <a href="#" class="nav-link">
                             <span class="nav-icon">📚</span>
-                            <span class="nav-text">Màn hình chính</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/src/main/resources/templates/user-form.html" class="nav-link">
-                            <span class="nav-icon">👤</span>
-                            <span class="nav-text">Thêm người dùng</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/src/main/resources/templates/book-form.html" class="nav-link">
-                            <span class="nav-icon">📖</span>
-                            <span class="nav-text">Thêm sách mới</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" onclick="showReports()">
-                            <span class="nav-icon">📊</span>
-                            <span class="nav-text">Báo cáo</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" onclick="showSettings()">
-                            <span class="nav-icon">⚙️</span>
-                            <span class="nav-text">Cài đặt</span>
+                            <span class="nav-text">Đang tải...</span>
                         </a>
                     </li>
                 </ul>
@@ -105,29 +79,29 @@
                     <!-- Left Side - Search & Filter -->
                     <div class="toolbar-left">
                         <div class="search-container">
-                            <div class="search-icon">Tìm</div>
+                            <div class="search-icon">🔍</div>
                             <input 
                                 type="text" 
                                 id="searchInput"
                                 class="form-control search-input" 
-                                placeholder="Tìm kiếm sách theo tiêu đề, tác giả, ISBN hoặc thể loại..."
+                                placeholder="Tìm kiếm theo tiêu đề, tác giả, ISBN..."
                                 aria-label="Tìm kiếm sách"
                             >
                         </div>
                         
-                        <select id="statusFilter" class="form-control" style="width: 150px;">
-                            <option value="all">Tất cả trạng thái</option>
-                            <option value="available">Có sẵn</option>
-                            <option value="borrowed">Đã mượn</option>
-                            <option value="lost">Bị mất</option>
+                        <select id="statusFilter" class="form-control filter-select">
+                            <option value="all">📚 Tất cả</option>
+                            <option value="available">✅ Có sẵn</option>
+                            <option value="borrowed">📖 Đã mượn</option>
+                            <option value="lost">❌ Bị mất</option>
                         </select>
                     </div>
                     
                     <!-- Right Side - Actions -->
                     <div class="toolbar-right">
-                        <!-- Nút thêm sách (Chỉ thủ thư viện) -->
-                        <button id="addBookBtn" class="btn librarian-only">
-                            Thêm sách mới
+                        <button id="addBookBtn" class="btn btn-primary add-book-btn">
+                            <span>➕</span>
+                            <span>Thêm sách mới</span>
                         </button>
                     </div>
                 </div>

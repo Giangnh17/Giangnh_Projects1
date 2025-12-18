@@ -21,27 +21,27 @@
         <nav class="navbar">
             <div class="container">
                 <div class="navbar-content">
-                    <!-- Brand/Logo -->
+                    <!-- Thương hiệu/Logo -->
                     <a href="/src/main/resources/templates/index.html" class="navbar-brand">
                         Trang web Quản lý thư viện sách Sarly
                     </a>
                     
-                    <!-- User Info and Actions -->
+                    <!-- User Information -->
                     <div class="navbar-nav">
-                        <!-- User Information -->
                         <div class="user-info">
                             <div class="user-avatar">
-                                <span>L</span>
+                                <span id="userInitial">U</span>
                             </div>
-                            <div>
-                                <div class="user-name">Demo Librarian</div>
-                                <div style="font-size: 0.8rem; color: rgba(245, 241, 230, 0.8);">Librarian</div>
+                            <div class="user-details">
+                                <div class="user-name" id="userName">Người dùng</div>
+                                <div class="user-role" id="userRole">Đang tải...</div>
                             </div>
                         </div>
                         
-                        <!-- Cancel Button -->
-                        <button id="cancelBtn" class="btn btn-outline" style="border-color: rgba(245, 241, 230, 0.5); color: var(--color-background);">
-                            Hủy
+                        <!-- Logout Button -->
+                        <button onclick="logout()" class="btn btn-outline logout-btn">
+                            <span>🚪</span>
+                            <span>Đăng xuất</span>
                         </button>
                     </div>
                 </div>
@@ -52,34 +52,11 @@
         <aside class="sidebar">
             <nav class="sidebar-nav">
                 <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="/src/main/resources/templates/index.html" class="nav-link">
-                            <span class="nav-icon">📚</span>
-                            <span class="nav-text">Màn hình chính</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/src/main/resources/templates/user-form.html" class="nav-link">
-                            <span class="nav-icon">👤</span>
-                            <span class="nav-text">Thêm người dùng</span>
-                        </a>
-                    </li>
+                    <!-- Dynamic content will be loaded by JavaScript -->
                     <li class="nav-item active">
-                        <a href="/src/main/resources/templates/book-form.html" class="nav-link">
-                            <span class="nav-icon">📖</span>
-                            <span class="nav-text">Thêm sách mới</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" onclick="showReports()">
-                            <span class="nav-icon">📊</span>
-                            <span class="nav-text">Báo cáo</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" onclick="showSettings()">
-                            <span class="nav-icon">⚙️</span>
-                            <span class="nav-text">Cài đặt</span>
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">📚</span>
+                            <span class="nav-text">Đang tải...</span>
                         </a>
                     </li>
                 </ul>

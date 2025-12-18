@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Bibliotheca Library</title>
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="./assets/css/variables.css">
+  <link rel="stylesheet" href="./assets/css/global.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/responsive.css">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar will be inserted here -->
+    
+    <div class="layout-content" id="layoutContent">
+      <!-- Header will be inserted here -->
+      
+      <main class="main-content">
+        <div class="content-header">
+          <div class="content-header-top">
+            <h2 class="content-title">Dashboard</h2>
+            <div class="content-actions">
+              <button class="btn btn-outline" onclick="location.reload()">
+                <i class="fas fa-sync-alt"></i>
+                Làm mới
+              </button>
+            </div>
+          </div>
+          <p class="content-description">Tổng quan hệ thống quản lý thư viện</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid" id="statsGrid">
+          <!-- Stats will be inserted here -->
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Thống kê theo danh mục</h3>
+              </div>
+              <div class="card-body">
+                <canvas id="categoryChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="col col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Tình trạng sách</h3>
+              </div>
+              <div class="card-body">
+                <canvas id="statusChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Books -->
+        <div class="row">
+          <div class="col col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Sách mới nhất</h3>
+              </div>
+              <div class="card-body">
+                <div id="recentBooksTable">
+                  <!-- Table will be inserted here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  <script src="./assets/js/components.js"></script>
+  
+  <script>
+    // Debug authentication
+    console.log('Dashboard loaded');
+    console.log('Token exists:', localStorage.getItem('token'));
+    console.log('User exists:', localStorage.getItem('currentUser'));
+    console.log('Is authenticated:', Auth.isAuthenticated());
+    
+    // Protect page - require authentication
+    if (!protectPage()) {
+      throw new Error('Unauthorized');
+    }
+
+    // State
+    let booksData = [];
+    let categoryChart = null;
+    let statusChart = null;
+
+    // Initialize page
+    async function initDashboard() {
+      try {
+        // Insert sidebar and header
+        const sidebarHTML = Components.getSidebarHTML();
+        const headerHTML = Components.getHeaderHTML('Dashboard', [
+          { text: 'Trang chủ', href: '/dashboard.html' },
+          { text: 'Dashboard' }
+        ]);
+
+        document.querySelector('.layout').insertAdjacentHTML('afterbegin', sidebarHTML);
+        document.getElementById('layoutContent').insertAdjacentHTML('afterbegin', headerHTML);
+
+        // Initialize components
+        Components.initSidebar();
+        Components.initHeader();
+        Auth.init();
+        Auth.setupLogoutButtons();
+
+        // Load data
+        await loadDashboardData();
+
+      } catch (error) {
+        console.error('Dashboard init error:', error);
+        Toast.error('Không thể tải dữ liệu dashboard');
+      }
+    }
+
+    // Load dashboard data
+    async function loadDashboardData() {
+      try {
+        Loading.show();
+
+        // Fetch books data
+        booksData = await BooksAPI.getAll();
+
+        // Render statistics
+        renderStats();
+
+        // Render charts
+        renderCharts();
+
+        // Render recent books
+        renderRecentBooks();
+
+        Loading.hide();
+      } catch (error) {
+        Loading.hide();
+        console.error('Load data error:', error);
+        Toast.error(error.message);
+      }
+    }
+
+    // Render statistics cards
+    function renderStats() {
+      const stats = StatsAPI.calculateStats(booksData);
+
+      const statsHTML = `
+        ${Components.getStatCardHTML({
+          icon: 'fas fa-book',
+          value: Utils.formatNumber(stats.totalBooks),
+          label: 'Tổng số đầu sách',
+          color: 'linear-gradient(135deg, #8b4513 0%, #5c2e0a 100%)'
+        })}
+        ${Components.getStatCardHTML({
+          icon: 'fas fa-boxes',
+          value: Utils.formatNumber(stats.totalQuantity),
+          label: 'Tổng số lượng sách',
+          color: 'linear-gradient(135deg, #2c5f2d 0%, #1a3d1b 100%)'
+        })}
+        ${Components.getStatCardHTML({
+          icon: 'fas fa-check-circle',
+          value: Utils.formatNumber(stats.availableBooks),
+          label: 'Sách có sẵn',
+          color: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)'
+        })}
+        ${Components.getStatCardHTML({
+          icon: 'fas fa-hand-holding',
+          value: Utils.formatNumber(stats.borrowedBooks),
+          label: 'Đang được mượn',
+          color: 'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)'
+        })}
+      `;
+
+      document.getElementById('statsGrid').innerHTML = statsHTML;
+    }
+
+    // Render charts
+    function renderCharts() {
+      renderCategoryChart();
+      renderStatusChart();
+    }
+
+    // Render category chart
+    function renderCategoryChart() {
+      const categoryStats = StatsAPI.getCategoryStats(booksData);
+      
+      const ctx = document.getElementById('categoryChart');
+      if (!ctx) return;
+
+      // Destroy existing chart
+      if (categoryChart) {
+        categoryChart.destroy();
+      }
+
+      categoryChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: categoryStats.map(c => c.name),
+          datasets: [{
+            label: 'Số lượng sách',
+            data: categoryStats.map(c => c.count),
+            backgroundColor: 'rgba(139, 69, 19, 0.7)',
+            borderColor: 'rgba(139, 69, 19, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Render status chart (Doughnut)
+    function renderStatusChart() {
+      const stats = StatsAPI.calculateStats(booksData);
+      
+      const ctx = document.getElementById('statusChart');
+      if (!ctx) return;
+
+      // Destroy existing chart
+      if (statusChart) {
+        statusChart.destroy();
+      }
+
+      statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Có sẵn', 'Đang mượn'],
+          datasets: [{
+            data: [stats.availableBooks, stats.borrowedBooks],
+            backgroundColor: [
+              'rgba(44, 95, 45, 0.8)',
+              'rgba(243, 156, 18, 0.8)'
+            ],
+            borderColor: [
+              'rgba(44, 95, 45, 1)',
+              'rgba(243, 156, 18, 1)'
+            ],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+
+    // Render recent books table
+    function renderRecentBooks() {
+      const recentBooks = booksData.slice(0, 10); // Get first 10 books
+
+      if (recentBooks.length === 0) {
+        document.getElementById('recentBooksTable').innerHTML = Components.getEmptyStateHTML({
+          icon: 'fas fa-book',
+          title: 'Chưa có sách',
+          message: 'Thư viện chưa có sách nào. Hãy thêm sách mới!'
+        });
+        return;
+      }
+
+      const tableHTML = `
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên sách</th>
+                <th>Tác giả</th>
+                <th>Thể loại</th>
+                <th>Số lượng</th>
+                <th>Có sẵn</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${recentBooks.map(book => `
+                <tr>
+                  <td>${book.id}</td>
+                  <td><strong>${Utils.escapeHtml(book.title)}</strong></td>
+                  <td>${Utils.escapeHtml(book.author)}</td>
+                  <td><span class="badge badge-primary">${Utils.escapeHtml(book.category)}</span></td>
+                  <td>${book.quantity}</td>
+                  <td>${book.available}</td>
+                  <td>
+                    ${book.available > 0 
+                      ? '<span class="badge badge-success">Có sẵn</span>' 
+                      : '<span class="badge badge-warning">Hết sách</span>'
+                    }
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.getElementById('recentBooksTable').innerHTML = tableHTML;
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
+</body>
+</html>

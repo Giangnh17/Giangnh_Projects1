@@ -31,11 +31,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/books/**").permitAll()  // Allow public access to books API
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/books/**").hasAnyRole("USER", "ADMIN", "LIBRARIAN")
                         .anyRequest().authenticated())
                 .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -47,10 +48,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://127.0.0.1:5500");
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedOriginPatterns(java.util.List.of("*"));  // Allow all origins with pattern
+        configuration.addAllowedMethod("*");  // GET, POST, PUT, DELETE, OPTIONS
+        configuration.addAllowedHeader("*");  // All headers including Authorization
+        configuration.setAllowCredentials(true);  // Allow credentials (cookies, authorization headers)
+        configuration.addExposedHeader("Authorization");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

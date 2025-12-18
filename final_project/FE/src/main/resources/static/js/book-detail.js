@@ -4,7 +4,13 @@
 // ============================================
 
 async function initializeBookDetail() {
-  console.log('Initializing Book Detail Page');
+  console.log('📖 Initializing Book Detail...');
+  
+  // Update user info in navbar
+  updateUserInfo();
+  
+  // Initialize dynamic sidebar
+  renderSidebar();
   
   // Get book ID from URL parameters
   const urlParams = new URLSearchParams(window.location.search);

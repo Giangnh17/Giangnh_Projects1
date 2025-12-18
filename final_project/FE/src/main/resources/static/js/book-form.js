@@ -4,7 +4,13 @@
 // ============================================
 
 function initializeBookForm() {
-  console.log('Initializing Book Form');
+  console.log('📝 Initializing Book Form...');
+  
+  // Update user info in navbar
+  updateUserInfo();
+  
+  // Initialize dynamic sidebar
+  renderSidebar();
   
   // Check if we're editing an existing book
   const urlParams = new URLSearchParams(window.location.search);

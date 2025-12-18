@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Người Dùng - Bibliotheca Library</title>
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="./assets/css/variables.css">
+  <link rel="stylesheet" href="./assets/css/global.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/responsive.css">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="layout">
+    <div class="layout-content" id="layoutContent">
+      <main class="main-content">
+        <div class="content-header">
+          <div class="content-header-top">
+            <h2 class="content-title">Quản Lý Người Dùng</h2>
+          </div>
+          <p class="content-description">Danh sách người dùng và vai trò trong hệ thống</p>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card">
+          <div class="card-body">
+            <div id="usersTable">
+              ${Components.getLoadingHTML()}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  <script src="./assets/js/components.js"></script>
+  
+  <script>
+    // Protect page - require LIBRARIAN role
+    if (!protectPage('LIBRARIAN')) {
+      throw new Error('Unauthorized');
+    }
+
+    // Mock users data (since we don't have user management API)
+    const mockUsers = [
+      {
+        id: 1,
+        name: 'Admin User',
+        email: 'admin@library.com',
+        role: 'ADMIN',
+        joinedDate: '2024-01-15',
+        status: 'active'
+      },
+      {
+        id: 2,
+        name: 'Librarian User',
+        email: 'librarian@library.com',
+        role: 'LIBRARIAN',
+        joinedDate: '2024-02-20',
+        status: 'active'
+      },
+      {
+        id: 3,
+        name: 'Regular User',
+        email: 'user@library.com',
+        role: 'VIEWER',
+        joinedDate: '2024-03-10',
+        status: 'active'
+      },
+      {
+        id: 4,
+        name: 'John Doe',
+        email: 'john.doe@library.com',
+        role: 'VIEWER',
+        joinedDate: '2024-04-05',
+        status: 'active'
+      },
+      {
+        id: 5,
+        name: 'Jane Smith',
+        email: 'jane.smith@library.com',
+        role: 'VIEWER',
+        joinedDate: '2024-05-12',
+        status: 'inactive'
+      }
+    ];
+
+    // Initialize page
+    async function initUsers() {
+      try {
+        // Insert sidebar and header
+        const sidebarHTML = Components.getSidebarHTML();
+        const headerHTML = Components.getHeaderHTML('Quản Lý Người Dùng', [
+          { text: 'Trang chủ', href: '/dashboard.html' },
+          { text: 'Người dùng' }
+        ]);
+
+        document.querySelector('.layout').insertAdjacentHTML('afterbegin', sidebarHTML);
+        document.getElementById('layoutContent').insertAdjacentHTML('afterbegin', headerHTML);
+
+        // Initialize components
+        Components.initSidebar();
+        Components.initHeader();
+        Auth.init();
+        Auth.setupLogoutButtons();
+
+        // Render users
+        renderUsers();
+
+      } catch (error) {
+        console.error('Users init error:', error);
+        Toast.error('Không thể tải dữ liệu');
+      }
+    }
+
+    // Render users table
+    function renderUsers() {
+      const container = document.getElementById('usersTable');
+
+      const getRoleBadge = (role) => {
+        const badges = {
+          'ADMIN': '<span class="badge badge-danger">Admin</span>',
+          'LIBRARIAN': '<span class="badge badge-primary">Librarian</span>',
+          'VIEWER': '<span class="badge badge-info">Viewer</span>',
+          'GUEST': '<span class="badge">Guest</span>'
+        };
+        return badges[role] || badges['GUEST'];
+      };
+
+      const getStatusBadge = (status) => {
+        return status === 'active' 
+          ? '<span class="badge badge-success">Hoạt động</span>'
+          : '<span class="badge badge-warning">Không hoạt động</span>';
+      };
+
+      const tableHTML = `
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Ngày tham gia</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${mockUsers.map(user => `
+                <tr>
+                  <td>${user.id}</td>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <div class="user-avatar" style="width: 2rem; height: 2rem; font-size: 0.875rem;">
+                        ${Utils.getInitials(user.name)}
+                      </div>
+                      <strong>${Utils.escapeHtml(user.name)}</strong>
+                    </div>
+                  </td>
+                  <td>${Utils.escapeHtml(user.email)}</td>
+                  <td>${getRoleBadge(user.role)}</td>
+                  <td>${Utils.formatDateSimple(user.joinedDate)}</td>
+                  <td>${getStatusBadge(user.status)}</td>
+                  <td>
+                    <div class="table-actions">
+                      <button class="btn btn-sm btn-outline" onclick="viewUser(${user.id})" title="Xem chi tiết">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="alert alert-info mt-3">
+          <i class="fas fa-info-circle"></i>
+          <strong>Lưu ý:</strong> API quản lý người dùng chưa được implement. Dữ liệu hiển thị là dữ liệu mẫu.
+        </div>
+      `;
+
+      container.innerHTML = tableHTML;
+    }
+
+    // View user details
+    function viewUser(id) {
+      const user = mockUsers.find(u => u.id === id);
+      if (!user) return;
+
+      const message = `
+        <div style="text-align: left;">
+          <p><strong>ID:</strong> ${user.id}</p>
+          <p><strong>Họ tên:</strong> ${user.name}</p>
+          <p><strong>Email:</strong> ${user.email}</p>
+          <p><strong>Vai trò:</strong> ${user.role}</p>
+          <p><strong>Ngày tham gia:</strong> ${Utils.formatDateSimple(user.joinedDate)}</p>
+          <p><strong>Trạng thái:</strong> ${user.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}</p>
+        </div>
+      `;
+
+      Toast.info(message, 6000);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initUsers);
+  </script>
+</body>
+</html>

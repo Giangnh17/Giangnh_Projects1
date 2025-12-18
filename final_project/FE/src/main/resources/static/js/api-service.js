@@ -19,20 +19,73 @@ async function login(loginData) {
       body: JSON.stringify(loginData)
     });
 
-    const responseData = await response.json();
-
-    if (response.ok && responseData.token) {
-      localStorage.setItem('token', responseData.token);
-      localStorage.setItem('currentUser', JSON.stringify(responseData.user));
-      return {
-        success: true,
-        data: responseData
-      };
+    // Check if response is successful
+    if (response.ok) {
+      // Try to get response as text first
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      // Check if response is JSON or plain text (token)
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (parseError) {
+        // If parsing fails, assume it's a plain token
+        console.log('Response is not JSON, treating as token');
+        responseData = { token: responseText.trim() };
+      }
+      
+      if (responseData.token) {
+        localStorage.setItem('token', responseData.token);
+        
+        // Create demo user with role based on email for testing
+        let demoUser = responseData.user;
+        if (!demoUser) {
+          // Assign demo roles based on email for testing
+          const email = loginData.email.toLowerCase();
+          let role = 'USER'; // default
+          
+          if (email.includes('admin')) {
+            role = 'ADMIN';
+          } else if (email.includes('librarian')) {
+            role = 'LIBRARIAN';
+          }
+          
+          demoUser = {
+            id: 1,
+            email: loginData.email,
+            name: loginData.email.split('@')[0],
+            role: role
+          };
+        }
+        
+        localStorage.setItem('currentUser', JSON.stringify(demoUser));
+        console.log('🎭 User logged in with role:', demoUser.role);
+        
+        return {
+          success: true,
+          data: responseData
+        };
+      } else {
+        return {
+          success: false,
+          error: 'No token received'
+        };
+      }
     } else {
-      return {
-        success: false,
-        error: responseData.message || 'Đăng nhập thất bại'
-      };
+      // Handle error responses
+      try {
+        const errorData = await response.json();
+        return {
+          success: false,
+          error: errorData.message || 'Đăng nhập thất bại'
+        };
+      } catch (parseError) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${response.statusText}`
+        };
+      }
     }
   } catch (error) {
     console.error('Login error:', error);

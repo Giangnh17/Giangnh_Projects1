@@ -11,12 +11,46 @@
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🏛️ Trang web Quản lý thư viện sách Sarly - Initializing...');
   
+  // Update user info in navbar
+  updateUserInfo();
+  
   // Initialize the appropriate page
   initializePage();
   
   // Set up global event listeners
   setupGlobalEventListeners();
 });
+
+// Update user info in navbar
+function updateUserInfo() {
+  const user = getCurrentUser();
+  if (user) {
+    // Update user name
+    const userNameEl = document.getElementById('userName');
+    if (userNameEl) {
+      userNameEl.textContent = user.name || user.email?.split('@')[0] || 'Người dùng';
+    }
+    
+    // Update user role
+    const userRoleEl = document.getElementById('userRole');
+    if (userRoleEl) {
+      const roleMap = {
+        'ADMIN': 'Quản trị viên',
+        'LIBRARIAN': 'Thủ thư',
+        'USER': 'Người dùng',
+        'GUEST': 'Khách'
+      };
+      userRoleEl.textContent = roleMap[user.role] || 'Người dùng';
+    }
+    
+    // Update user initial
+    const userInitialEl = document.getElementById('userInitial');
+    if (userInitialEl) {
+      const initial = (user.name || user.email)?.charAt(0)?.toUpperCase() || 'U';
+      userInitialEl.textContent = initial;
+    }
+  }
+}
 
 function initializePage() {
   const path = window.location.pathname;
@@ -48,6 +82,201 @@ function setupGlobalEventListeners() {
 // ============================================
 // NAVIGATION FUNCTIONS
 // ============================================
+
+// Generate dynamic sidebar based on user role
+function generateSidebar() {
+  const userRole = getUserRole();
+  const currentPath = window.location.pathname;
+  
+  const sidebarItems = [];
+  
+  // Always show main screen
+  sidebarItems.push({
+    href: "/src/main/resources/templates/index.html",
+    icon: "📚",
+    text: "Màn hình chính",
+    active: currentPath.includes('index')
+  });
+  
+  // Role-based menu items
+  if (userRole === 'ADMIN') {
+    // Admin can access everything
+    sidebarItems.push(
+      {
+        href: "#",
+        icon: "👤", 
+        text: "Thêm người dùng",
+        onclick: "showNotImplemented('Thêm người dùng')",
+        active: false
+      },
+      {
+        href: "/src/main/resources/templates/book-form.html",
+        icon: "📖",
+        text: "Thêm sách mới", 
+        active: currentPath.includes('book-form')
+      }
+    );
+  } else if (userRole === 'USER') {
+    // User can only add books
+    sidebarItems.push({
+      href: "/src/main/resources/templates/book-form.html",
+      icon: "📖",
+      text: "Thêm sách mới",
+      active: currentPath.includes('book-form')
+    });
+  }
+  // LIBRARIAN cannot access add user or add book
+  
+  // Common items for all authenticated users
+  if (userRole !== 'GUEST') {
+    sidebarItems.push(
+      {
+        href: "#",
+        icon: "📊",
+        text: "Báo cáo",
+        onclick: "showNotImplemented('Báo cáo')",
+        active: false
+      },
+      {
+        href: "#", 
+        icon: "⚙️",
+        text: "Cài đặt",
+        onclick: "showNotImplemented('Cài đặt')",
+        active: false
+      }
+    );
+  }
+  
+  return sidebarItems;
+}
+
+// Render sidebar HTML
+function renderSidebar() {
+  const sidebarElement = document.querySelector('.sidebar-nav ul.nav-list');
+  if (!sidebarElement) return;
+  
+  const items = generateSidebar();
+  const html = items.map(item => `
+    <li class="nav-item ${item.active ? 'active' : ''}">
+      <a href="${item.href}" class="nav-link" ${item.onclick ? `onclick="${item.onclick}; return false;"` : ''}>
+        <span class="nav-icon">${item.icon}</span>
+        <span class="nav-text">${item.text}</span>
+      </a>
+    </li>
+  `).join('');
+  
+  sidebarElement.innerHTML = html;
+}
+
+// Show not implemented notification
+function showNotImplemented(feature) {
+  showNotification(`Chức năng "${feature}" chưa được triển khai`, 'info');
+}
+
+// Generate dynamic sidebar based on user role
+function generateSidebar() {
+  const userRole = getUserRole();
+  const currentPath = window.location.pathname;
+  
+  const sidebarItems = [];
+  
+  // Always show main screen
+  sidebarItems.push({
+    href: "/src/main/resources/templates/index.html",
+    icon: "📚",
+    text: "Màn hình chính",
+    active: currentPath.includes('index')
+  });
+  
+  // Role-based menu items
+  if (userRole === 'ADMIN') {
+    // Admin can access everything
+    sidebarItems.push(
+      {
+        href: "#",
+        icon: "👤", 
+        text: "Thêm người dùng",
+        onclick: "showNotImplemented('Thêm người dùng')",
+        active: false
+      },
+      {
+        href: "/src/main/resources/templates/book-form.html",
+        icon: "📖",
+        text: "Thêm sách mới", 
+        active: currentPath.includes('book-form')
+      }
+    );
+  } else if (userRole === 'USER') {
+    // User can only add books
+    sidebarItems.push({
+      href: "/src/main/resources/templates/book-form.html",
+      icon: "📖",
+      text: "Thêm sách mới",
+      active: currentPath.includes('book-form')
+    });
+  }
+  // LIBRARIAN cannot access add user or add book
+  
+  // Common items for all authenticated users
+  if (userRole !== 'GUEST') {
+    sidebarItems.push(
+      {
+        href: "#",
+        icon: "📊",
+        text: "Báo cáo",
+        onclick: "showNotImplemented('Báo cáo')",
+        active: false
+      },
+      {
+        href: "#", 
+        icon: "⚙️",
+        text: "Cài đặt",
+        onclick: "showNotImplemented('Cài đặt')",
+        active: false
+      }
+    );
+  }
+  
+  return sidebarItems;
+}
+
+// Render sidebar HTML
+function renderSidebar() {
+  const sidebarElement = document.querySelector('.sidebar-nav ul.nav-list');
+  if (!sidebarElement) return;
+  
+  const items = generateSidebar();
+  const html = items.map(item => `
+    <li class="nav-item ${item.active ? 'active' : ''}">
+      <a href="${item.href}" class="nav-link" ${item.onclick ? `onclick="${item.onclick}; return false;"` : ''}>
+        <span class="nav-icon">${item.icon}</span>
+        <span class="nav-text">${item.text}</span>
+      </a>
+    </li>
+  `).join('');
+  
+  sidebarElement.innerHTML = html;
+}
+
+// Show not implemented notification
+function showNotImplemented(feature) {
+  showNotification(`Chức năng "${feature}" chưa được triển khai`, 'info');
+}
+
+// Logout function  
+function logout() {
+  // Clear local storage
+  localStorage.removeItem('token');
+  localStorage.removeItem('currentUser');
+  
+  // Show logout message
+  showNotification('Đã đăng xuất thành công!', 'success');
+  
+  // Redirect to login page
+  setTimeout(() => {
+    window.location.href = '/src/main/resources/templates/auth-login.html';
+  }, 1000);
+}
 
 function viewBook(bookId) {
   window.location.href = `/src/main/resources/templates/book-detail.html?id=${bookId}`;
