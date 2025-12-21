@@ -53,54 +53,13 @@
   <script src="./assets/js/components.js"></script>
   
   <script>
-    // Protect page - require LIBRARIAN role
-    if (!protectPage('LIBRARIAN')) {
+    // Protect page - require ADMIN role (only admin can manage users)
+    if (!protectPage('ADMIN')) {
       throw new Error('Unauthorized');
     }
 
-    // Mock users data (since we don't have user management API)
-    const mockUsers = [
-      {
-        id: 1,
-        name: 'Admin User',
-        email: 'admin@library.com',
-        role: 'ADMIN',
-        joinedDate: '2024-01-15',
-        status: 'active'
-      },
-      {
-        id: 2,
-        name: 'Librarian User',
-        email: 'librarian@library.com',
-        role: 'LIBRARIAN',
-        joinedDate: '2024-02-20',
-        status: 'active'
-      },
-      {
-        id: 3,
-        name: 'Regular User',
-        email: 'user@library.com',
-        role: 'VIEWER',
-        joinedDate: '2024-03-10',
-        status: 'active'
-      },
-      {
-        id: 4,
-        name: 'John Doe',
-        email: 'john.doe@library.com',
-        role: 'VIEWER',
-        joinedDate: '2024-04-05',
-        status: 'active'
-      },
-      {
-        id: 5,
-        name: 'Jane Smith',
-        email: 'jane.smith@library.com',
-        role: 'VIEWER',
-        joinedDate: '2024-05-12',
-        status: 'inactive'
-      }
-    ];
+    // State
+    let allUsers = [];
 
     // Initialize page
     async function initUsers() {
@@ -121,8 +80,8 @@
         Auth.init();
         Auth.setupLogoutButtons();
 
-        // Render users
-        renderUsers();
+        // Load users from backend
+        await loadUsers();
 
       } catch (error) {
         console.error('Users init error:', error);
@@ -130,24 +89,51 @@
       }
     }
 
+    // Load users from backend
+    async function loadUsers() {
+      try {
+        Loading.show();
+        allUsers = await AdminAPI.getAllUsers();
+        renderUsers();
+        Loading.hide();
+      } catch (error) {
+        Loading.hide();
+        console.error('Load users error:', error);
+        Toast.error(error.message);
+      }
+    }
+
     // Render users table
     function renderUsers() {
       const container = document.getElementById('usersTable');
 
+      if (!allUsers || allUsers.length === 0) {
+        container.innerHTML = `
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            Chưa có người dùng nào trong hệ thống.
+          </div>
+        `;
+        return;
+      }
+
       const getRoleBadge = (role) => {
+        // Remove ROLE_ prefix if exists
+        const cleanRole = role.startsWith('ROLE_') ? role.substring(5) : role;
+        
         const badges = {
           'ADMIN': '<span class="badge badge-danger">Admin</span>',
           'LIBRARIAN': '<span class="badge badge-primary">Librarian</span>',
-          'VIEWER': '<span class="badge badge-info">Viewer</span>',
+          'USER': '<span class="badge badge-info">User</span>',
           'GUEST': '<span class="badge">Guest</span>'
         };
-        return badges[role] || badges['GUEST'];
+        return badges[cleanRole] || badges['GUEST'];
       };
 
-      const getStatusBadge = (status) => {
-        return status === 'active' 
+      const getStatusBadge = (isDeleted) => {
+        return !isDeleted
           ? '<span class="badge badge-success">Hoạt động</span>'
-          : '<span class="badge badge-warning">Không hoạt động</span>';
+          : '<span class="badge badge-warning">Đã xóa</span>';
       };
 
       const tableHTML = `
@@ -155,35 +141,36 @@
           <table class="table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Họ tên</th>
                 <th>Email</th>
                 <th>Vai trò</th>
-                <th>Ngày tham gia</th>
+                <th>Ngày tạo</th>
                 <th>Trạng thái</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
             <tbody>
-              ${mockUsers.map(user => `
+              ${allUsers.map(user => `
                 <tr>
-                  <td>${user.id}</td>
                   <td>
                     <div style="display: flex; align-items: center; gap: 10px;">
                       <div class="user-avatar" style="width: 2rem; height: 2rem; font-size: 0.875rem;">
-                        ${Utils.getInitials(user.name)}
+                        ${Utils.getInitials(user.fullName || user.email)}
                       </div>
-                      <strong>${Utils.escapeHtml(user.name)}</strong>
+                      <strong>${Utils.escapeHtml(user.fullName || 'N/A')}</strong>
                     </div>
                   </td>
                   <td>${Utils.escapeHtml(user.email)}</td>
-                  <td>${getRoleBadge(user.role)}</td>
-                  <td>${Utils.formatDateSimple(user.joinedDate)}</td>
-                  <td>${getStatusBadge(user.status)}</td>
+                  <td>${getRoleBadge(user.role?.roleName || 'USER')}</td>
+                  <td>${Utils.formatDateSimple(user.createAt)}</td>
+                  <td>${getStatusBadge(user.isDeleted)}</td>
                   <td>
                     <div class="table-actions">
-                      <button class="btn btn-sm btn-outline" onclick="viewUser(${user.id})" title="Xem chi tiết">
-                        <i class="fas fa-eye"></i>
+                      <button class="btn btn-sm btn-outline" onclick="changeRole(${user.id})" title="Đổi vai trò" ${user.isDeleted ? 'disabled' : ''}>
+                        <i class="fas fa-user-tag"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline" onclick="deleteUser(${user.id})" title="Xóa người dùng" ${user.isDeleted ? 'disabled' : ''}>
+                        <i class="fas fa-trash"></i>
                       </button>
                     </div>
                   </td>
@@ -192,33 +179,63 @@
             </tbody>
           </table>
         </div>
-
-        <div class="alert alert-info mt-3">
-          <i class="fas fa-info-circle"></i>
-          <strong>Lưu ý:</strong> API quản lý người dùng chưa được implement. Dữ liệu hiển thị là dữ liệu mẫu.
-        </div>
       `;
 
       container.innerHTML = tableHTML;
     }
 
-    // View user details
-    function viewUser(id) {
-      const user = mockUsers.find(u => u.id === id);
+    // Change user role
+    async function changeRole(userId) {
+      const user = allUsers.find(u => u.id === userId);
       if (!user) return;
 
-      const message = `
-        <div style="text-align: left;">
-          <p><strong>ID:</strong> ${user.id}</p>
-          <p><strong>Họ tên:</strong> ${user.name}</p>
-          <p><strong>Email:</strong> ${user.email}</p>
-          <p><strong>Vai trò:</strong> ${user.role}</p>
-          <p><strong>Ngày tham gia:</strong> ${Utils.formatDateSimple(user.joinedDate)}</p>
-          <p><strong>Trạng thái:</strong> ${user.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}</p>
-        </div>
-      `;
+      const currentRole = user.role?.roleName || 'ROLE_USER';
+      const cleanRole = currentRole.startsWith('ROLE_') ? currentRole.substring(5) : currentRole;
 
-      Toast.info(message, 6000);
+      // Show modal to select new role
+      const newRole = prompt(`Đổi vai trò cho ${user.fullName || user.email}\n\nVai trò hiện tại: ${cleanRole}\n\nNhập vai trò mới (USER, LIBRARIAN, ADMIN):`);
+      
+      if (!newRole) return;
+
+      const roleUpper = newRole.toUpperCase();
+      if (!['USER', 'LIBRARIAN', 'ADMIN'].includes(roleUpper)) {
+        Toast.error('Vai trò không hợp lệ! Chỉ chấp nhận: USER, LIBRARIAN, ADMIN');
+        return;
+      }
+
+      // Backend expects ROLE_ prefix
+      const roleWithPrefix = `ROLE_${roleUpper}`;
+
+      try {
+        Loading.show();
+        await AdminAPI.updateUserRole(userId, roleWithPrefix);
+        Toast.success('Đã cập nhật vai trò thành công!');
+        await loadUsers(); // Reload users
+        Loading.hide();
+      } catch (error) {
+        Loading.hide();
+        Toast.error(error.message);
+      }
+    }
+
+    // Delete user
+    async function deleteUser(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if (!user) return;
+
+      const confirmed = confirm(`Bạn có chắc chắn muốn xóa người dùng: ${user.fullName || user.email}?`);
+      if (!confirmed) return;
+
+      try {
+        Loading.show();
+        await AdminAPI.deleteUser(userId);
+        Toast.success('Đã xóa người dùng thành công!');
+        await loadUsers(); // Reload users
+        Loading.hide();
+      } catch (error) {
+        Loading.hide();
+        Toast.error(error.message);
+      }
     }
 
     // Initialize on page load

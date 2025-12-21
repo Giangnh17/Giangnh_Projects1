@@ -184,22 +184,22 @@
           color: 'linear-gradient(135deg, #8b4513 0%, #5c2e0a 100%)'
         })}
         ${Components.getStatCardHTML({
-          icon: 'fas fa-boxes',
-          value: Utils.formatNumber(stats.totalQuantity),
-          label: 'Tổng số lượng sách',
-          color: 'linear-gradient(135deg, #2c5f2d 0%, #1a3d1b 100%)'
-        })}
-        ${Components.getStatCardHTML({
           icon: 'fas fa-check-circle',
           value: Utils.formatNumber(stats.availableBooks),
           label: 'Sách có sẵn',
-          color: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)'
+          color: 'linear-gradient(135deg, #2c5f2d 0%, #1a3d1b 100%)'
         })}
         ${Components.getStatCardHTML({
           icon: 'fas fa-hand-holding',
           value: Utils.formatNumber(stats.borrowedBooks),
-          label: 'Đang được mượn',
+          label: 'Sách đang mượn',
           color: 'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)'
+        })}
+        ${Components.getStatCardHTML({
+          icon: 'fas fa-tags',
+          value: Utils.formatNumber(stats.categories),
+          label: 'Danh mục',
+          color: 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)'
         })}
       `;
 
@@ -310,35 +310,37 @@
         return;
       }
 
+      const getStatusBadge = (status) => {
+        const statusMap = {
+          'AVAILABLE': { label: 'Có sẵn', class: 'success' },
+          'BORROWED': { label: 'Đang mượn', class: 'warning' },
+          'UNAVAILABLE': { label: 'Không có sẵn', class: 'danger' }
+        };
+        
+        const statusInfo = statusMap[status] || { label: status, class: 'info' };
+        return `<span class="badge badge-${statusInfo.class}">${statusInfo.label}</span>`;
+      };
+
       const tableHTML = `
         <div class="table-container">
           <table class="table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Tên sách</th>
                 <th>Tác giả</th>
                 <th>Thể loại</th>
-                <th>Số lượng</th>
-                <th>Có sẵn</th>
                 <th>Trạng thái</th>
+                <th>Ngày tạo</th>
               </tr>
             </thead>
             <tbody>
               ${recentBooks.map(book => `
                 <tr>
-                  <td>${book.id}</td>
                   <td><strong>${Utils.escapeHtml(book.title)}</strong></td>
                   <td>${Utils.escapeHtml(book.author)}</td>
                   <td><span class="badge badge-primary">${Utils.escapeHtml(book.category)}</span></td>
-                  <td>${book.quantity}</td>
-                  <td>${book.available}</td>
-                  <td>
-                    ${book.available > 0 
-                      ? '<span class="badge badge-success">Có sẵn</span>' 
-                      : '<span class="badge badge-warning">Hết sách</span>'
-                    }
-                  </td>
+                  <td>${getStatusBadge(book.status)}</td>
+                  <td>${Utils.formatDateSimple(book.createAt)}</td>
                 </tr>
               `).join('')}
             </tbody>

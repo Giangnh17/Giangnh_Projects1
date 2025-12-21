@@ -38,7 +38,7 @@ const Components = {
                   <span class="nav-text">Quản lý sách</span>
                 </a>
               </li>
-              <li class="nav-item" data-role-required="LIBRARIAN">
+              <li class="nav-item" data-role-required="ADMIN">
                 <a href="./users.html" class="nav-link">
                   <i class="fas fa-users nav-icon"></i>
                   <span class="nav-text">Người dùng</span>
@@ -59,16 +59,6 @@ const Components = {
             </ul>
           </div>
         </nav>
-
-        <div class="sidebar-footer">
-          <div class="sidebar-user">
-            <div class="sidebar-user-avatar">JD</div>
-            <div class="sidebar-user-info">
-              <div class="sidebar-user-name">John Doe</div>
-              <div class="sidebar-user-role">User</div>
-            </div>
-          </div>
-        </div>
       </aside>
 
       <!-- Sidebar Overlay for Mobile -->
@@ -83,13 +73,6 @@ const Components = {
    * @returns {string} Header HTML
    */
   getHeaderHTML(pageTitle = 'Dashboard', breadcrumbs = []) {
-    const breadcrumbHTML = breadcrumbs.map((item, index) => `
-      <span class="breadcrumb-item">
-        ${item.href ? `<a href="${item.href}">${item.text}</a>` : item.text}
-        ${index < breadcrumbs.length - 1 ? '<span class="breadcrumb-separator">/</span>' : ''}
-      </span>
-    `).join('');
-
     return `
       <header class="header">
         <div class="header-left">
@@ -98,22 +81,14 @@ const Components = {
           </button>
           <div>
             <h1 class="page-title">${pageTitle}</h1>
-            ${breadcrumbs.length > 0 ? `<nav class="breadcrumb">${breadcrumbHTML}</nav>` : ''}
           </div>
         </div>
 
         <div class="header-right">
-          <div class="header-actions">
-            <button class="header-btn" title="Thông báo">
-              <i class="fas fa-bell"></i>
-              <span class="header-btn-badge">3</span>
-            </button>
-          </div>
-
           <div class="user-menu" id="userMenu">
             <button class="user-menu-toggle" id="userMenuToggle">
-              <div class="user-avatar">JD</div>
-              <span class="user-name">John Doe</span>
+              <div class="user-avatar"></div>
+              <span class="user-name"></span>
               <i class="fas fa-chevron-down"></i>
             </button>
             <div class="user-menu-dropdown">

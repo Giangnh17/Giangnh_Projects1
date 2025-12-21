@@ -23,11 +23,18 @@ const Auth = {
 
   /**
    * Get user's role
-   * @returns {string} User role (GUEST, VIEWER, LIBRARIAN, ADMIN)
+   * @returns {string} User role (USER, LIBRARIAN, ADMIN, GUEST)
    */
   getUserRole() {
     const user = this.getCurrentUser();
-    return user?.role || 'GUEST';
+    let role = user?.role || 'GUEST';
+    
+    // Backend returns roles with ROLE_ prefix, remove it
+    if (role.startsWith('ROLE_')) {
+      role = role.substring(5); // Remove 'ROLE_' prefix
+    }
+    
+    return role;
   },
 
   /**
@@ -40,14 +47,14 @@ const Auth = {
 
   /**
    * Check if user has required role
-   * Role hierarchy: GUEST < VIEWER < LIBRARIAN < ADMIN
+   * Role hierarchy: GUEST < USER < LIBRARIAN < ADMIN
    * @param {string} requiredRole - Required role
    * @returns {boolean}
    */
   hasRole(requiredRole) {
     const roleHierarchy = {
       'GUEST': 0,
-      'VIEWER': 1,
+      'USER': 1,
       'LIBRARIAN': 2,
       'ADMIN': 3
     };

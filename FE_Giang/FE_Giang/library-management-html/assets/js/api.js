@@ -160,15 +160,40 @@ const AuthAPI = {
         // Decode JWT để lấy thông tin user (payload)
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
+          console.log('🔍 JWT Payload:', payload);
+          console.log('🔍 Available keys:', Object.keys(payload));
+          
+          // Extract role - JWT thường lưu role trong authorities array
+          let role = 'USER'; // default
+          
+          // Try different possible locations for role
+          if (payload.authorities && Array.isArray(payload.authorities)) {
+            // authorities là array of strings: ["ROLE_ADMIN"]
+            role = payload.authorities[0] || 'USER';
+            console.log('🔍 Role from authorities array:', role);
+          } else if (payload.role) {
+            role = payload.role;
+            console.log('🔍 Role from role field:', role);
+          } else if (payload.authority) {
+            role = payload.authority;
+            console.log('🔍 Role from authority field:', role);
+          }
+          
+          // Remove ROLE_ prefix if exists
+          if (typeof role === 'string' && role.startsWith('ROLE_')) {
+            role = role.substring(5); // Remove 'ROLE_' prefix
+            console.log('🔍 Role after removing ROLE_ prefix:', role);
+          }
+          
           user = {
             email: payload.sub || payload.email,
-            name: payload.name || payload.sub || payload.email,
-            role: payload.role || payload.authorities?.[0] || 'USER'
+            name: payload.name || payload.fullName || payload.sub || payload.email,
+            role: role // Role without ROLE_ prefix
           };
-          console.log('Decoded user from JWT:', user);
+          console.log('✅ Decoded user from JWT:', user);
         } catch (e) {
           console.warn('Could not decode JWT:', e);
-          user = { email: credentials.email };
+          user = { email: credentials.email, role: 'USER' };
         }
       } 
       // Backend trả về object với token và user
@@ -211,7 +236,13 @@ const AuthAPI = {
    */
   async register(userData) {
     try {
-      const response = await http.post('/auth/register', userData);
+      // Backend expects { email, password, name } only
+      const payload = {
+        email: userData.email,
+        password: userData.password,
+        name: userData.name || userData.fullName
+      };
+      const response = await http.post('/auth/register', payload);
       return response;
     } catch (error) {
       throw new Error(error.message || 'Đăng ký thất bại');
@@ -340,12 +371,15 @@ const BooksAPI = {
   /**
    * Filter books by category (client-side)
    * @param {Array} books - List of books
-   * @param {string} category - Category to filter
+   * @param {string} category - Category to filter (partial match)
    * @returns {Array} Filtered books
    */
   filterByCategory(books, category) {
-    if (!category || category === 'all') return books;
-    return books.filter(book => book.category === category);
+    if (!category || !category.trim()) return books;
+    const searchTerm = category.toLowerCase().trim();
+    return books.filter(book => 
+      book.category?.toLowerCase().includes(searchTerm)
+    );
   },
 
   /**
@@ -363,22 +397,88 @@ const BooksAPI = {
 };
 
 // ========================================
-// ADMIN API (if user is ADMIN)
+// USER MANAGEMENT API
+// ========================================
+
+const UserAPI = {
+  /**
+   * Update user password
+   * PUT /api/user/password
+   * @param {Object} data - { oldPassword, newPassword }
+   * @returns {Promise<Object>} Success message
+   */
+  async updatePassword(data) {
+    try {
+      const response = await http.put('/api/user/password', data);
+      return response;
+    } catch (error) {
+      throw new Error(error.message || 'Không thể đổi mật khẩu');
+    }
+  },
+
+  /**
+   * Update user full name
+   * PUT /api/user/fullname
+   * @param {Object} data - { fullName }
+   * @returns {Promise<Object>} Success message
+   */
+  async   updateFullName(data) {
+    try {
+      const response = await http.put('/api/user/fullname', data);
+      return response;
+    } catch (error) {
+      throw new Error(error.message || 'Không thể cập nhật tên');
+    }
+  }
+};
+
+// ========================================
+// ADMIN API
 // ========================================
 
 const AdminAPI = {
   /**
-   * Create book (Admin only)
-   * POST /admin/books
-   * @param {Object} bookData - Book data
-   * @returns {Promise<Object>} Created book
+   * Get all users (Admin only)
+   * GET /admin/users
+   * @returns {Promise<Array>} List of users
    */
-  async createBook(bookData) {
+  async getAllUsers() {
     try {
-      const response = await http.post('/admin/books', bookData);
+      const response = await http.get('/admin/users');
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      throw new Error(error.message || 'Không thể tải danh sách người dùng');
+    }
+  },
+
+  /**
+   * Update user role (Admin only)
+   * PUT /admin/users/{id}/role
+   * @param {number} userId - User ID
+   * @param {string} roleName - New role name (ROLE_USER, ROLE_ADMIN, ROLE_LIBRARIAN)
+   * @returns {Promise<Object>} Updated user
+   */
+  async updateUserRole(userId, roleName) {
+    try {
+      const response = await http.put(`/admin/users/${userId}/role`, { roleName });
       return response;
     } catch (error) {
-      throw new Error(error.message || 'Không thể tạo sách (Admin)');
+      throw new Error(error.message || 'Không thể cập nhật vai trò');
+    }
+  },
+
+  /**
+   * Soft delete user (Admin only)
+   * DELETE /admin/users/{id}
+   * @param {number} userId - User ID
+   * @returns {Promise<Object>} Success message
+   */
+  async deleteUser(userId) {
+    try {
+      const response = await http.delete(`/admin/users/${userId}`);
+      return response;
+    } catch (error) {
+      throw new Error(error.message || 'Không thể xóa người dùng');
     }
   }
 };
@@ -390,6 +490,8 @@ const AdminAPI = {
 const StatsAPI = {
   /**
    * Calculate statistics from books data
+   * Backend Book model: { id, title, author, category, status, createAt, updateAt, isDeleted }
+   * Status: AVAILABLE, BORROWED, UNAVAILABLE
    * @param {Array} books - List of books
    * @returns {Object} Statistics object
    */
@@ -397,24 +499,24 @@ const StatsAPI = {
     if (!books || books.length === 0) {
       return {
         totalBooks: 0,
-        totalQuantity: 0,
         availableBooks: 0,
         borrowedBooks: 0,
+        unavailableBooks: 0,
         categories: 0
       };
     }
 
     const totalBooks = books.length;
-    const totalQuantity = books.reduce((sum, book) => sum + (book.quantity || 0), 0);
-    const availableBooks = books.reduce((sum, book) => sum + (book.available || 0), 0);
-    const borrowedBooks = totalQuantity - availableBooks;
+    const availableBooks = books.filter(b => b.status === 'AVAILABLE').length;
+    const borrowedBooks = books.filter(b => b.status === 'BORROWED').length;
+    const unavailableBooks = books.filter(b => b.status === 'UNAVAILABLE').length;
     const categories = BooksAPI.getCategories(books).length;
 
     return {
       totalBooks,
-      totalQuantity,
       availableBooks,
       borrowedBooks,
+      unavailableBooks,
       categories
     };
   },
@@ -436,8 +538,10 @@ const StatsAPI = {
           available: 0
         };
       }
-      categoryMap[category].count += book.quantity || 0;
-      categoryMap[category].available += book.available || 0;
+      categoryMap[category].count += 1;
+      if (book.status === 'AVAILABLE') {
+        categoryMap[category].available += 1;
+      }
     });
 
     return Object.values(categoryMap).sort((a, b) => b.count - a.count);
@@ -457,12 +561,10 @@ const StatsAPI = {
       if (!authorMap[author]) {
         authorMap[author] = {
           name: author,
-          bookCount: 0,
-          totalQuantity: 0
+          bookCount: 0
         };
       }
       authorMap[author].bookCount += 1;
-      authorMap[author].totalQuantity += book.quantity || 0;
     });
 
     return Object.values(authorMap)
@@ -478,6 +580,7 @@ const StatsAPI = {
 window.API = {
   Auth: AuthAPI,
   Books: BooksAPI,
+  User: UserAPI,
   Admin: AdminAPI,
   Stats: StatsAPI
 };
@@ -485,5 +588,6 @@ window.API = {
 // Also export individual APIs for convenience
 window.AuthAPI = AuthAPI;
 window.BooksAPI = BooksAPI;
+window.UserAPI = UserAPI;
 window.AdminAPI = AdminAPI;
 window.StatsAPI = StatsAPI;

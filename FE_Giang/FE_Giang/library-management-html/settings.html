@@ -31,7 +31,7 @@
           <div class="content-header-top">
             <h2 class="content-title">Cài Đặt</h2>
           </div>
-          <p class="content-description">Quản lý thông tin cá nhân và tùy chỉnh hệ thống</p>
+          <p class="content-description">Quản lý thông tin cá nhân</p>
         </div>
 
         <div class="row">
@@ -97,59 +97,6 @@
                     Đổi mật khẩu
                   </button>
                 </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- System Preferences -->
-        <div class="row">
-          <div class="col col-12">
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">Tùy Chỉnh Hệ Thống</h3>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col col-md-6">
-                    <div class="form-group">
-                      <label for="language" class="form-label">Ngôn ngữ</label>
-                      <select id="language" class="form-control">
-                        <option value="vi" selected>Tiếng Việt</option>
-                        <option value="en">English</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="col col-md-6">
-                    <div class="form-group">
-                      <label for="theme" class="form-label">Giao diện</label>
-                      <select id="theme" class="form-control">
-                        <option value="light" selected>Sáng</option>
-                        <option value="dark">Tối</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-check">
-                  <input type="checkbox" id="notifications" class="form-check-input" checked>
-                  <label for="notifications" class="form-check-label">
-                    Nhận thông báo từ hệ thống
-                  </label>
-                </div>
-
-                <div class="form-check">
-                  <input type="checkbox" id="emailNotifications" class="form-check-input" checked>
-                  <label for="emailNotifications" class="form-check-label">
-                    Nhận thông báo qua email
-                  </label>
-                </div>
-
-                <button class="btn btn-primary mt-3" onclick="savePreferences()">
-                  <i class="fas fa-save"></i>
-                  Lưu cài đặt
-                </button>
               </div>
             </div>
           </div>
@@ -258,19 +205,28 @@
           return;
         }
 
-        Toast.info('Chức năng cập nhật profile chưa được implement ở backend');
-        
-        // Uncomment when API is ready:
-        // try {
-        //   Loading.show();
-        //   await AuthAPI.updateProfile({ name: nameInput.value });
-        //   await Auth.refreshProfile();
-        //   Toast.success('Cập nhật thông tin thành công!');
-        //   Loading.hide();
-        // } catch (error) {
-        //   Loading.hide();
-        //   Toast.error(error.message);
-        // }
+        try {
+          Loading.show();
+          
+          // Call API to update full name
+          await UserAPI.updateFullName({ fullName: nameInput.value.trim() });
+          
+          // Update local storage
+          const user = Auth.getCurrentUser();
+          if (user) {
+            user.name = nameInput.value.trim();
+            Storage.set('currentUser', user);
+          }
+          
+          // Refresh UI
+          Auth.init();
+          
+          Toast.success('Cập nhật thông tin thành công!');
+          Loading.hide();
+        } catch (error) {
+          Loading.hide();
+          Toast.error(error.message);
+        }
       });
 
       // Password form
@@ -290,46 +246,23 @@
 
         if (!isValid) return;
 
-        Toast.info('Chức năng đổi mật khẩu chưa được implement ở backend');
-
-        // Uncomment when API is ready:
-        // try {
-        //   Loading.show();
-        //   await AuthAPI.changePassword({
-        //     currentPassword: currentPassword.value,
-        //     newPassword: newPassword.value
-        //   });
-        //   Toast.success('Đổi mật khẩu thành công!');
-        //   e.target.reset();
-        //   Loading.hide();
-        // } catch (error) {
-        //   Loading.hide();
-        //   Toast.error(error.message);
-        // }
+        try {
+          Loading.show();
+          
+          // Call API to change password
+          await UserAPI.updatePassword({
+            oldPassword: currentPassword.value,
+            newPassword: newPassword.value
+          });
+          
+          Toast.success('Đổi mật khẩu thành công!');
+          e.target.reset();
+          Loading.hide();
+        } catch (error) {
+          Loading.hide();
+          Toast.error(error.message);
+        }
       });
-    }
-
-    // Save preferences
-    function savePreferences() {
-      const language = document.getElementById('language').value;
-      const theme = document.getElementById('theme').value;
-      const notifications = document.getElementById('notifications').checked;
-      const emailNotifications = document.getElementById('emailNotifications').checked;
-
-      // Save to localStorage
-      Storage.set('preferences', {
-        language,
-        theme,
-        notifications,
-        emailNotifications
-      });
-
-      Toast.success('Đã lưu cài đặt thành công!');
-      
-      // Apply theme (simple implementation)
-      if (theme === 'dark') {
-        Toast.info('Giao diện tối sẽ được áp dụng trong phiên bản tiếp theo');
-      }
     }
 
     // Initialize on page load

@@ -18,8 +18,10 @@ public class BookController {
 
     // GET /api/books - Lấy danh sách tất cả sách (Public - tất cả user có thể xem)
     @GetMapping
-    public ResponseEntity<?> getAllBooks() {
-        return bookService.getAllBooks();
+    public ResponseEntity<?> getAllBooks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return bookService.getAllBooks(page, size);
     }
 
     // GET /api/books/{id} - Lấy thông tin sách theo ID (Public - tất cả user có thể xem)

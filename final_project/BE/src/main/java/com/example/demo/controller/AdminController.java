@@ -16,8 +16,10 @@ public class AdminController {
     private AdminService adminService;
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers() {
-        return adminService.getAllUsers();
+    public ResponseEntity<?> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return adminService.getAllUsers(page, size);
     }
 
     @PutMapping("/users/{userId}/role")

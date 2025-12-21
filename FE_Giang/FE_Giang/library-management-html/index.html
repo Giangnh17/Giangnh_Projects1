@@ -307,17 +307,17 @@
     // Auto-fill demo credentials (for testing - remove in production)
     document.addEventListener('keydown', (e) => {
       if (e.altKey && e.key === 'a') {
-        emailInput.value = 'admin@library.com';
+        emailInput.value = 'admin@gmail.com';
         passwordInput.value = 'admin123';
         Toast.info('Đã điền thông tin Admin');
       }
       if (e.altKey && e.key === 'l') {
-        emailInput.value = 'librarian@library.com';
-        passwordInput.value = 'lib123';
+        emailInput.value = 'librarian@gmail.com';
+        passwordInput.value = 'librarian';
         Toast.info('Đã điền thông tin Librarian');
       }
       if (e.altKey && e.key === 'u') {
-        emailInput.value = 'user@library.com';
+        emailInput.value = 'user@gmail.com';
         passwordInput.value = 'user123';
         Toast.info('Đã điền thông tin User');
       }

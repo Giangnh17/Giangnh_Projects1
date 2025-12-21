@@ -163,57 +163,6 @@
   display: none;
 }
 
-.sidebar-footer {
-  padding: var(--space-lg);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: auto;
-}
-
-.sidebar-user {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-sm);
-  border-radius: var(--radius-md);
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.sidebar-user-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-full);
-  background-color: var(--accent-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: var(--font-weight-bold);
-  flex-shrink: 0;
-}
-
-.sidebar-user-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.sidebar-user-name {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-inverse);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sidebar-user-role {
-  font-size: var(--font-size-xs);
-  color: rgba(255, 255, 255, 0.7);
-  text-transform: capitalize;
-}
-
-.sidebar.collapsed .sidebar-user-info {
-  display: none;
-}
-
 /* Header */
 .header {
   height: var(--header-height);

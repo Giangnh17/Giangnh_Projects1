@@ -6,6 +6,6 @@ import org.springframework.http.ResponseEntity;
 public interface AdminService {
     ResponseEntity<?> updateUserRole(Long userId, UpdateUserRoleRequest request);
     ResponseEntity<?> softDeleteUser(Long userId);
-    ResponseEntity<?> getAllUsers();
+    ResponseEntity<?> getAllUsers(int page, int size);
 }
 

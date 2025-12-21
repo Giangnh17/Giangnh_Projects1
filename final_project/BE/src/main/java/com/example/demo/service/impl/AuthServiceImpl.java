@@ -65,7 +65,12 @@ public class AuthServiceImpl implements AuthService {
         UserDetails userDetails =
                 userDetailsService.loadUserByUsername(user.getEmail());
 
-        return ResponseEntity.ok(jwtService.generateToken(userDetails));
+        String roleName = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(auth -> auth.getAuthority())
+                .orElse("ROLE_USER");
+
+        return ResponseEntity.ok(jwtService.generateTokenWithRole(userDetails, roleName));
     }
 
     @Override
@@ -78,7 +83,13 @@ public class AuthServiceImpl implements AuthService {
         );
 
         UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
-        return ResponseEntity.ok(jwtService.generateToken(user));
+
+        String roleName = user.getAuthorities().stream()
+                .findFirst()
+                .map(auth -> auth.getAuthority())
+                .orElse("ROLE_USER");
+
+        return ResponseEntity.ok(jwtService.generateTokenWithRole(user, roleName));
     }
 
     @Override

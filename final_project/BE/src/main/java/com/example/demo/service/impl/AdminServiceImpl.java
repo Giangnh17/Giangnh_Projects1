@@ -1,18 +1,22 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.request.UpdateUserRoleRequest;
+import com.example.demo.dto.response.PageResponse;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -79,10 +83,22 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public ResponseEntity<?> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(int page, int size) {
         try {
-            List<User> users = userRepository.findAll();
-            return ResponseEntity.ok(users);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<User> userPage = userRepository.findAll(pageable);
+
+            PageResponse<User> pageResponse = new PageResponse<>(
+                    userPage.getContent(),
+                    userPage.getNumber(),
+                    userPage.getSize(),
+                    userPage.getTotalElements(),
+                    userPage.getTotalPages(),
+                    userPage.isLast(),
+                    userPage.isFirst()
+            );
+
+            return ResponseEntity.ok(pageResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error retrieving users: " + e.getMessage());

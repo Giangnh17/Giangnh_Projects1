@@ -56,17 +56,16 @@
                 </div>
               </div>
               <div class="col col-md-3">
-                <select class="form-control" id="categoryFilter">
-                  <option value="all">Tất cả thể loại</option>
-                  <option value="Văn học">Văn học</option>
-                  <option value="Khoa học">Khoa học</option>
-                  <option value="Lịch sử">Lịch sử</option>
-                  <option value="Triết học">Triết học</option>
-                  <option value="Kinh tế">Kinh tế</option>
-                  <option value="Công nghệ">Công nghệ</option>
-                  <option value="Nghệ thuật">Nghệ thuật</option>
-                  <option value="Khác">Khác</option>
-                </select>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="categoryFilter" 
+                  placeholder="Lọc theo thể loại..." 
+                  list="categoryFilterList"
+                >
+                <datalist id="categoryFilterList">
+                  <!-- Sẽ được populate động từ danh sách sách -->
+                </datalist>
               </div>
               <div class="col col-md-3">
                 <select class="form-control" id="sortBy">
@@ -122,17 +121,27 @@
           <div class="col col-md-6">
             <div class="form-group">
               <label for="category" class="form-label required">Thể loại</label>
-              <select id="category" class="form-control" required>
-                <option value="">Chọn thể loại</option>
-                <option value="Văn học">Văn học</option>
-                <option value="Khoa học">Khoa học</option>
-                <option value="Lịch sử">Lịch sử</option>
-                <option value="Triết học">Triết học</option>
-                <option value="Kinh tế">Kinh tế</option>
-                <option value="Công nghệ">Công nghệ</option>
-                <option value="Nghệ thuật">Nghệ thuật</option>
-                <option value="Khác">Khác</option>
-              </select>
+              <input 
+                type="text" 
+                id="category" 
+                class="form-control" 
+                required 
+                placeholder="Nhập thể loại (VD: Văn học, Khoa học...)" 
+                list="categoryList"
+              >
+              <datalist id="categoryList">
+                <option value="Văn học">
+                <option value="Khoa học">
+                <option value="Lịch sử">
+                <option value="Triết học">
+                <option value="Kinh tế">
+                <option value="Công nghệ">
+                <option value="Nghệ thuật">
+                <option value="Tiểu thuyết">
+                <option value="Truyện ngắn">
+                <option value="Tâm lý học">
+                <option value="Giáo dục">
+              </datalist>
             </div>
           </div>
         </div>
@@ -218,7 +227,9 @@
       }, 300));
 
       // Category filter
-      document.getElementById('categoryFilter').addEventListener('change', filterAndRenderBooks);
+      document.getElementById('categoryFilter').addEventListener('input', Utils.debounce(() => {
+        filterAndRenderBooks();
+      }, 300));
 
       // Sort
       document.getElementById('sortBy').addEventListener('change', filterAndRenderBooks);
@@ -247,7 +258,14 @@
 
     // Populate category filter
     function populateCategoryFilter() {
-      // Categories are now hardcoded in HTML select
+      const categories = BooksAPI.getCategories(allBooks);
+      const datalist = document.getElementById('categoryFilterList');
+      
+      if (datalist) {
+        datalist.innerHTML = categories.map(cat => 
+          `<option value="${Utils.escapeHtml(cat)}">`
+        ).join('');
+      }
     }
 
     // Filter and render books
@@ -305,7 +323,6 @@
           <table class="table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Tên sách</th>
                 <th>Tác giả</th>
                 <th>Thể loại</th>
@@ -316,7 +333,6 @@
             <tbody>
               ${filteredBooks.map(book => `
                 <tr>
-                  <td>${book.id}</td>
                   <td>
                     <strong>${Utils.escapeHtml(book.title)}</strong>
                   </td>

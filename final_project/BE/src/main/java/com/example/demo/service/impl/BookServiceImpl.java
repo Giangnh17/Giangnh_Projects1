@@ -1,15 +1,18 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.request.CreateBookRequest;
+import com.example.demo.dto.response.PageResponse;
 import com.example.demo.entity.Book;
 import com.example.demo.repository.BookRepository;
 import com.example.demo.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,15 +22,28 @@ public class BookServiceImpl implements BookService {
     private BookRepository bookRepository;
 
     @Override
-    public ResponseEntity<?> getAllBooks() {
+    public ResponseEntity<?> getAllBooks(int page, int size) {
         try {
-            List<Book> books = bookRepository.findAll();
-            return ResponseEntity.ok(books);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Book> bookPage = bookRepository.findAll(pageable);
+
+            PageResponse<Book> pageResponse = new PageResponse<>(
+                    bookPage.getContent(),
+                    bookPage.getNumber(),
+                    bookPage.getSize(),
+                    bookPage.getTotalElements(),
+                    bookPage.getTotalPages(),
+                    bookPage.isLast(),
+                    bookPage.isFirst()
+            );
+
+            return ResponseEntity.ok(pageResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error retrieving books: " + e.getMessage());
         }
     }
+
 
     @Override
     public ResponseEntity<?> createBook(CreateBookRequest request) {
