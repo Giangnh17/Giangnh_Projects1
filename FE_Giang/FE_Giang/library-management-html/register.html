@@ -3,17 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Bibliotheca - Đăng ký tài khoản">
-  <title>Đăng Ký - Bibliotheca Library</title>
+  <meta name="description" content="Sarly - Đăng ký tài khoản">
+  <title>Đăng Ký - Sarly Library</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Noto+Serif:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS -->
   <link rel="stylesheet" href="./assets/css/variables.css">
   <link rel="stylesheet" href="./assets/css/global.css">
   <link rel="stylesheet" href="./assets/css/components.css">
   <link rel="stylesheet" href="./assets/css/responsive.css">
+  <link rel="stylesheet" href="./assets/css/pages/register.css">
   
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -26,7 +32,7 @@
       align-items: center;
       justify-content: center;
       padding: var(--space-lg);
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      background: linear-gradient(135deg, #8b7e70 0%, #6d5346 100%);
       position: relative;
       overflow: hidden;
     }
@@ -45,46 +51,59 @@
     .register-card {
       position: relative;
       width: 100%;
-      max-width: 500px;
+      max-width: 460px;
       background: var(--surface);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-2xl);
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       overflow: hidden;
     }
 
     .register-header {
       text-align: center;
-      padding: var(--space-2xl) var(--space-xl) var(--space-xl);
-      background: linear-gradient(180deg, var(--surface-dark) 0%, var(--surface) 100%);
+      padding: var(--space-xl) var(--space-lg) var(--space-lg);
+      background: linear-gradient(180deg, #7a6250 0%, #6d5346 100%);
       border-bottom: 1px solid var(--border-color);
     }
 
     .register-logo {
-      font-size: 4rem;
-      margin-bottom: var(--space-md);
-      display: block;
+      font-size: 2.5rem;
+      margin-bottom: var(--space-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 70px;
+      height: 70px;
+      background-color: rgba(250, 248, 245, 0.15);
+      border: 2px solid rgba(250, 248, 245, 0.3);
+      border-radius: 50%;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
 
     .register-title {
-      font-size: var(--font-size-3xl);
-      color: var(--primary-color);
-      margin-bottom: var(--space-xs);
+      font-size: var(--font-size-2xl);
+      color: var(--text-inverse);
+      margin-bottom: 4px;
+      font-weight: var(--font-weight-bold);
+      letter-spacing: 0.05em;
     }
 
     .register-subtitle {
-      font-size: var(--font-size-base);
-      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      color: rgba(250, 248, 245, 0.85);
       font-family: var(--font-family-secondary);
+      font-weight: var(--font-weight-normal);
+      letter-spacing: 0.08em;
     }
 
     .register-body {
-      padding: var(--space-xl);
+      padding: var(--space-lg) var(--space-xl);
+      background-color: #faf8f5;
     }
 
     .register-footer {
-      padding: var(--space-lg) var(--space-xl);
+      padding: var(--space-md) var(--space-lg);
       text-align: center;
-      background-color: var(--surface-dark);
+      background-color: #f5f1ea;
       border-top: 1px solid var(--border-color);
     }
 
@@ -187,7 +206,7 @@
       <div class="register-header">
         <span class="register-logo">📚</span>
         <h1 class="register-title">Đăng Ký</h1>
-        <p class="register-subtitle">Tạo tài khoản Bibliotheca mới</p>
+        <p class="register-subtitle">Tạo tài khoản Sarly mới</p>
       </div>
 
       <div class="register-body">

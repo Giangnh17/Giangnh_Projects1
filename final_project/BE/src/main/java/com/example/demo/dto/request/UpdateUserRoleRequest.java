@@ -1,10 +1,9 @@
-package com.example.demo.entity;
+package com.example.demo.dto.request;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
-@Entity
-@Table(name = "roles")
-public class Role extends BaseEntity {
+public class UpdateUserRoleRequest {
+    @NotBlank(message = "Role không được để trống")
     private String roleName;
 
     public String getRoleName() {
@@ -15,3 +14,4 @@ public class Role extends BaseEntity {
         this.roleName = roleName;
     }
 }
+

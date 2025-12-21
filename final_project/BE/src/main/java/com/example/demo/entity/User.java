@@ -10,10 +10,9 @@ public class User extends BaseEntity {
     private String password;
     private String fullName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
-
 
     public String getEmail() {
         return email;

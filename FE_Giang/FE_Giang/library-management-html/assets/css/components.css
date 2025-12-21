@@ -16,7 +16,7 @@
   text-align: center;
   white-space: nowrap;
   border: 2px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: 4px;
   cursor: pointer;
   transition: all var(--transition-fast);
   user-select: none;
@@ -99,7 +99,7 @@
 .card {
   background-color: var(--surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: 6px;
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: box-shadow var(--transition-base);
@@ -137,7 +137,7 @@
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
   color: var(--text-inverse);
   padding: var(--space-lg);
-  border-radius: var(--radius-lg);
+  border-radius: 6px;
   box-shadow: var(--shadow-md);
 }
 
@@ -162,15 +162,17 @@
 
 /* Form Elements */
 .form-group {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .form-label {
   display: block;
   margin-bottom: var(--space-sm);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .form-label.required::after {
@@ -186,14 +188,14 @@
   color: var(--text-primary);
   background-color: var(--surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 4px;
   transition: all var(--transition-fast);
 }
 
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+  box-shadow: 0 0 0 3px rgba(109, 83, 70, 0.15);
 }
 
 .form-control::placeholder {
@@ -259,7 +261,7 @@ select.form-control {
 .table-container {
   width: 100%;
   overflow-x: auto;
-  border-radius: var(--radius-lg);
+  border-radius: 6px;
   border: 1px solid var(--border-color);
 }
 
@@ -354,7 +356,7 @@ select.form-control {
   padding: var(--space-md) var(--space-lg);
   margin-bottom: var(--space-lg);
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: 4px;
   font-family: var(--font-family-secondary);
 }
 
@@ -391,7 +393,7 @@ select.form-control {
   max-width: 400px;
   background-color: var(--surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 4px;
   box-shadow: var(--shadow-xl);
   padding: var(--space-lg);
   z-index: var(--z-tooltip);
@@ -475,7 +477,7 @@ select.form-control {
   max-width: 600px;
   max-height: 90vh;
   background-color: var(--surface);
-  border-radius: var(--radius-lg);
+  border-radius: 6px;
   box-shadow: var(--shadow-2xl);
   z-index: var(--z-modal);
   display: none;
@@ -527,7 +529,7 @@ select.form-control {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
+  border-radius: 4px;
   transition: all var(--transition-fast);
 }
 
@@ -636,7 +638,7 @@ select.form-control {
   border: 1px solid var(--border-color);
   background-color: var(--surface);
   color: var(--text-primary);
-  border-radius: var(--radius-md);
+  border-radius: 4px;
   cursor: pointer;
   transition: all var(--transition-fast);
   min-width: 2.5rem;

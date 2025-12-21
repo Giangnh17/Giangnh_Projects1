@@ -18,10 +18,14 @@
 Đây là một **RESTful API Backend** cho hệ thống quản lý thư viện (Library Management System) được xây dựng bằng **Spring Boot**. Hệ thống cung cấp các chức năng:
 
 - ✅ **Xác thực và phân quyền** (Authentication & Authorization) với JWT
-- ✅ **Quản lý sách** (Books Management) - CRUD operations
+- ✅ **Quản lý sách** (Books Management) - CRUD operations với phân quyền theo role
 - ✅ **Quản lý người dùng** (User Management) với role-based access control
+- ✅ **Admin Dashboard** - Quản lý users, update role, soft delete
+- ✅ **User Profile Management** - Update password và full name
 - ✅ **Soft delete** cho các entity
 - ✅ **Automatic timestamp tracking** (createdAt, updatedAt)
+- ✅ **Global Exception Handler** - Error responses chuẩn và dễ hiểu
+- ✅ **Lazy Loading Fix** - JOIN FETCH để tối ưu performance
 
 ---
 
@@ -50,44 +54,52 @@
 src/main/java/com/example/demo/
 │
 ├── config/                          # ⚙️ Configuration & Security
-│   ├── CustomUserDetailsService.java    - Load user từ database
-│   ├── DataInitializer.java             - Khởi tạo dữ liệu mặc định
+│   ├── CustomUserDetailsService.java    - Load user từ database với JOIN FETCH
+│   ├── DataInitializer.java             - Khởi tạo dữ liệu mặc định (Admin, Librarian, User)
+│   ├── GlobalExceptionHandler.java      - ✨ NEW: Xử lý validation errors
 │   ├── JwtAuthFilter.java               - Filter xác thực JWT
 │   ├── JwtService.java                  - Service xử lý JWT
-│   └── SecurityConfig.java              - Cấu hình Spring Security
+│   └── SecurityConfig.java              - Cấu hình Spring Security với method security
 │
 ├── controller/                      # 🎮 REST Controllers
 │   ├── AuthController.java              - Endpoint đăng ký/đăng nhập
-│   ├── BookController.java              - Endpoint quản lý sách (public)
-│   └── AdminBookController.java         - Endpoint quản lý sách (admin)
+│   ├── BookController.java              - Endpoint quản lý sách (CRUD với phân quyền)
+│   ├── AdminBookController.java         - Endpoint quản lý sách (admin)
+│   ├── AdminController.java             - ✨ NEW: Endpoint quản lý users (admin only)
+│   └── UserController.java              - ✨ NEW: Endpoint cho user/librarian
 │
 ├── dto/                             # 📦 Data Transfer Objects
 │   ├── request/
-│   │   ├── CreateBookRequest.java
+│   │   ├── CreateBookRequest.java       - Request tạo/update sách (category là String)
 │   │   ├── LoginRequest.java
-│   │   └── RegisterRequest.java
+│   │   ├── RegisterRequest.java
+│   │   ├── UpdateFullNameRequest.java   - ✨ NEW: Request update tên
+│   │   ├── UpdatePasswordRequest.java   - ✨ NEW: Request đổi mật khẩu
+│   │   └── UpdateUserRoleRequest.java   - ✨ NEW: Request update role
 │   └── response/
 │       └── UserProfileResponse.java
 │
 ├── entity/                          # 🗂 Database Entities
 │   ├── BaseEntity.java                  - Abstract entity với các field chung
-│   ├── Book.java                        - Entity sách
-│   ├── Category.java                    - Entity danh mục
-│   ├── Role.java                        - Entity vai trò
+│   ├── Book.java                        - Entity sách (category là String)
+│   ├── Role.java                        - Entity vai trò (đã fix @OneToMany)
 │   └── User.java                        - Entity người dùng
 │
 ├── repository/                      # 💾 Data Access Layer
 │   ├── BookRepository.java
-│   ├── CategoryRepository.java
 │   ├── RoleRepository.java
-│   └── UserRepository.java
+│   └── UserRepository.java              - JOIN FETCH role để tránh lazy loading
 │
 ├── service/                         # 🔧 Business Logic Layer
 │   ├── AuthService.java                 - Interface
 │   ├── BookService.java                 - Interface
+│   ├── UserService.java                 - ✨ NEW: Interface cho user management
+│   ├── AdminService.java                - ✨ NEW: Interface cho admin operations
 │   └── impl/
 │       ├── AuthServiceImpl.java         - Implementation
-│       └── BookServiceImpl.java         - Implementation
+│       ├── BookServiceImpl.java         - Implementation (xử lý String category)
+│       ├── UserServiceImpl.java         - ✨ NEW: Implementation update password/name
+│       └── AdminServiceImpl.java        - ✨ NEW: Implementation quản lý users
 │
 └── FinalProjectApplication.java     # 🚀 Main Application
 ```
@@ -129,10 +141,12 @@ public class User extends BaseEntity {
 public class Book extends BaseEntity {
     - title: String
     - author: String
-    - category: String
+    - category: String (đã đổi từ ManyToOne Category thành String)
     - status: String (AVAILABLE/BORROWED)
 }
 ```
+
+**Lưu ý**: Category đã được đơn giản hóa từ relationship entity thành String field để dễ quản lý.
 
 #### Role Entity
 ```java
@@ -151,7 +165,8 @@ public class Role extends BaseEntity {
 
 ```java
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByEmail(String email);
+    @Query("SELECT u FROM User u JOIN FETCH u.role WHERE u.email = :email")
+    User findByEmail(@Param("email") String email);
 }
 ```
 
@@ -159,6 +174,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 - Tự động generate SQL queries
 - Không cần viết boilerplate code
 - Type-safe queries
+- **JOIN FETCH** tránh LazyInitializationException khi load user với role
 
 ---
 
@@ -403,9 +419,10 @@ jwt.expiration=1m                           # Token hết hạn sau 1 phút (dem
 ### Data Initialization
 `DataInitializer.java` tự động chạy khi application start:
 - Tạo 3 roles: ROLE_USER, ROLE_ADMIN, ROLE_LIBRARIAN
-- Tạo admin account mặc định:
-  - Email: `admin@gmail.com`
-  - Password: `admin`
+- Tạo 3 tài khoản mặc định:
+  - **Admin**: `admin@gmail.com` / `admin`
+  - **Librarian**: `librarian@gmail.com` / `librarian`
+  - **User**: `user@gmail.com` / `user`
 
 ---
 
@@ -449,11 +466,11 @@ POST /auth/login
 ### Book Management Endpoints
 | Method | Endpoint | Description | Access |
 |--------|----------|-------------|--------|
-| GET | `/api/books` | Lấy danh sách tất cả sách | USER, ADMIN, LIBRARIAN |
-| GET | `/api/books/{id}` | Lấy thông tin sách theo ID | USER, ADMIN, LIBRARIAN |
+| GET | `/api/books` | Lấy danh sách tất cả sách | Public |
+| GET | `/api/books/{id}` | Lấy thông tin sách theo ID | Public |
 | POST | `/api/books` | Tạo sách mới | LIBRARIAN, ADMIN |
 | PUT | `/api/books/{id}` | Cập nhật thông tin sách | LIBRARIAN, ADMIN |
-| DELETE | `/api/books/{id}` | Xóa sách | ADMIN |
+| DELETE | `/api/books/{id}` | Xóa sách | LIBRARIAN, ADMIN |
 
 #### Example Request:
 
@@ -469,10 +486,68 @@ Headers: Authorization: Bearer <token>
 }
 ```
 
+### User Management Endpoints
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| PUT | `/api/user/password` | Đổi mật khẩu | USER, LIBRARIAN |
+| PUT | `/api/user/fullname` | Cập nhật tên hiển thị | USER, LIBRARIAN |
+
+#### Example Requests:
+
+**Update Password:**
+```json
+PUT /api/user/password
+Headers: Authorization: Bearer <token>
+{
+  "oldPassword": "oldpass123",
+  "newPassword": "newpass123"
+}
+```
+
+**Update Full Name:**
+```json
+PUT /api/user/fullname
+Headers: Authorization: Bearer <token>
+{
+  "fullName": "John Doe Updated"
+}
+```
+
 ### Admin Endpoints
 | Method | Endpoint | Description | Access |
 |--------|----------|-------------|--------|
-| POST | `/admin/books` | Admin tạo sách | ADMIN only |
+| GET | `/admin/users` | Lấy danh sách tất cả users | ADMIN |
+| PUT | `/admin/users/{id}/role` | Cập nhật role của user | ADMIN |
+| DELETE | `/admin/users/{id}` | Soft delete user | ADMIN |
+
+#### Example Requests:
+
+**Get All Users:**
+```json
+GET /admin/users
+Headers: Authorization: Bearer <admin-token>
+```
+
+**Update User Role:**
+```json
+PUT /admin/users/3/role
+Headers: Authorization: Bearer <admin-token>
+{
+  "roleName": "ROLE_LIBRARIAN"
+}
+```
+
+**Soft Delete User:**
+```json
+DELETE /admin/users/3
+Headers: Authorization: Bearer <admin-token>
+```
+
+### Test Endpoints
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| GET | `/api/test/public` | Test server hoạt động | Public |
+| POST | `/api/test/echo` | Test JSON format | Public |
 
 ---
 
@@ -499,10 +574,18 @@ configuration.setAllowCredentials(true);
 ### 4. Role-Based Access Control (RBAC)
 ```java
 .requestMatchers("/auth/**").permitAll()
+.requestMatchers("/api/test/**").permitAll()
+.requestMatchers("/api/books").permitAll()  // GET books - public
+.requestMatchers("/api/books/{id}").permitAll()  // GET book by id - public
+.requestMatchers("/api/books/**").hasAnyRole("ADMIN", "LIBRARIAN")
 .requestMatchers("/admin/**").hasRole("ADMIN")
-.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-.requestMatchers("/books/**").hasAnyRole("USER", "ADMIN", "LIBRARIAN")
+.requestMatchers("/api/user/**").hasAnyRole("USER", "LIBRARIAN")
 ```
+
+**Phân quyền theo role:**
+- **USER**: Xem sách, update profile (password, fullname)
+- **LIBRARIAN**: USER permissions + CRUD sách
+- **ADMIN**: LIBRARIAN permissions + quản lý users (update role, soft delete)
 
 ### 5. Stateless Session
 ```java
@@ -614,13 +697,13 @@ Database
 ```sql
 CREATE TABLE users (
     id BIGINT PRIMARY KEY IDENTITY,
-    email VARCHAR(255),
-    password VARCHAR(255),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
     full_name VARCHAR(255),
-    role_id BIGINT,
-    create_at DATETIME,
-    update_at DATETIME,
-    is_deleted BIT,
+    role_id BIGINT NOT NULL,
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE(),
+    is_deleted BIT DEFAULT 0,
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 ```
@@ -629,13 +712,13 @@ CREATE TABLE users (
 ```sql
 CREATE TABLE books (
     id BIGINT PRIMARY KEY IDENTITY,
-    title VARCHAR(255),
-    author VARCHAR(255),
-    category VARCHAR(255),
-    status VARCHAR(50),
-    create_at DATETIME,
-    update_at DATETIME,
-    is_deleted BIT
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    status VARCHAR(50) DEFAULT 'AVAILABLE',
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE(),
+    is_deleted BIT DEFAULT 0
 );
 ```
 
@@ -643,12 +726,14 @@ CREATE TABLE books (
 ```sql
 CREATE TABLE roles (
     id BIGINT PRIMARY KEY IDENTITY,
-    role_name VARCHAR(50),
-    create_at DATETIME,
-    update_at DATETIME,
-    is_deleted BIT
+    role_name VARCHAR(50) UNIQUE NOT NULL,
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE(),
+    is_deleted BIT DEFAULT 0
 );
 ```
+
+**Lưu ý**: Category đã được đơn giản hóa từ bảng riêng thành VARCHAR field trong books table.
 
 ---
 
@@ -671,10 +756,31 @@ CREATE TABLE roles (
 ### 4. Role-Based Authorization
 - Phân quyền chi tiết theo endpoint
 - Support multiple roles per user
+- 3 roles: USER, LIBRARIAN, ADMIN
 
 ### 5. CORS Support
 - Allow cross-origin requests
 - Configured for specific origins
+
+### 6. Global Exception Handler
+- Validation errors trả về format chuẩn
+- Dễ dàng debug và xử lý lỗi
+- Custom error messages
+
+### 7. Lazy Loading Fix
+- JOIN FETCH để tránh LazyInitializationException
+- Tối ưu performance với single query
+- Load user và role cùng lúc
+
+### 8. User Management
+- User/Librarian tự update password
+- User/Librarian tự update full name
+- Admin quản lý users (update role, soft delete)
+
+### 9. Simplified Category Management
+- Category là String thay vì entity
+- Dễ dàng thêm/sửa category
+- Giảm complexity của database
 
 ---
 
@@ -713,6 +819,59 @@ Error: Token đã hết hạn
 Error: Access Denied
 ```
 **Giải pháp**: Kiểm tra role của user có đủ quyền truy cập endpoint không
+
+### Lỗi LazyInitializationException
+```
+Error: Could not initialize proxy - no session
+```
+**Giải pháp**: Đã fix bằng JOIN FETCH trong UserRepository
+
+### Lỗi Content-Type not supported
+```
+Error: Content-Type 'text/plain' is not supported
+```
+**Giải pháp**: Trong Postman, chọn Body → raw → JSON (không phải Text)
+
+### Lỗi Validation Failed
+```
+Error: Field 'roleName': rejected value [null]
+```
+**Giải pháp**: Kiểm tra request body có đủ các field bắt buộc không, đúng format JSON
+
+### Lỗi Token không đúng format
+```
+Error: Token không bắt đầu với Bearer String
+```
+**Giải pháp**: 
+- Không dùng Basic Auth, chỉ dùng Bearer Token
+- Header phải là: `Authorization: Bearer {token}`
+- Có khoảng trắng giữa "Bearer" và token
+
+---
+
+## 📚 Tài liệu bổ sung
+
+Các file hướng dẫn chi tiết đã được tạo trong thư mục gốc:
+
+### Quick Guides:
+- `POSTMAN_GUIDE.md` - Hướng dẫn sử dụng Postman chi tiết
+- `QUICK_FIX_UPDATE_ROLE.md` - Fix lỗi update user role nhanh
+- `SOLUTION_SUMMARY.md` - Tóm tắt giải pháp tổng thể
+
+### Detailed Fixes:
+- `FIX_API_ERRORS.md` - Fix lỗi Content-Type và Authorization
+- `FIX_BASIC_AUTH_ERROR.md` - Fix lỗi dùng Basic Auth thay vì Bearer Token
+- `FIX_LAZY_INITIALIZATION_ERROR.md` - Fix lỗi lazy loading
+- `FIX_UPDATE_USER_ROLE_ERROR.md` - Fix lỗi validation khi update role
+
+### API Documentation:
+- `API_CHANGES_SUMMARY.md` - Tổng quan tất cả API endpoints và thay đổi
+- `API_RESPONSE_EXAMPLES.md` - Ví dụ responses cho mọi trường hợp
+- `FINAL_SUMMARY.md` - Tổng kết hoàn chỉnh dự án
+
+### Testing:
+- `Postman_Collection.json` - Import vào Postman để test ngay
+- `test-update-role.http` - Test file cho VS Code REST Client / IntelliJ HTTP Client
 
 ---
 

@@ -3,32 +3,32 @@
    ======================================== */
 
 :root {
-  /* Colors - Vintage Library Theme */
-  --primary-color: #8b4513;        /* Saddle Brown */
-  --primary-dark: #5c2e0a;
-  --primary-light: #a0522d;
+  /* Colors - Elegant Bronze Library Theme */
+  --primary-color: #6d5346;        /* Bronze Brown */
+  --primary-dark: #5c4a3f;
+  --primary-light: #8b7e70;
   
-  --secondary-color: #2c5f2d;      /* Forest Green */
-  --secondary-dark: #1a3d1b;
-  --secondary-light: #4a7c4e;
+  --secondary-color: #7a6250;      /* Warm Bronze */
+  --secondary-dark: #6d5346;
+  --secondary-light: #9d8b7a;
   
-  --accent-color: #d4af37;         /* Gold */
-  --accent-dark: #b8941f;
+  --accent-color: #a68968;         /* Bronze Gold */
+  --accent-dark: #8b7355;
   
   /* Neutral Colors */
-  --background: #f5f5dc;           /* Beige */
-  --surface: #ffffff;
-  --surface-dark: #f0e6d2;
+  --background: #f5f1ea;           /* Cream Beige */
+  --surface: #faf8f5;
+  --surface-dark: #e8dfd5;
   
-  --text-primary: #2c2c2c;
-  --text-secondary: #5c5c5c;
-  --text-light: #8c8c8c;
-  --text-inverse: #ffffff;
+  --text-primary: #2c231a;
+  --text-secondary: #5c5047;
+  --text-light: #8b7e70;
+  --text-inverse: #faf8f5;
   
   /* Border Colors */
-  --border-color: #d4c4a8;
-  --border-light: #e8dcc8;
-  --border-dark: #a89968;
+  --border-color: #d4c9ba;
+  --border-light: #e8dfd5;
+  --border-dark: #9d8b7a;
   
   /* Status Colors */
   --success: #2c5f2d;
@@ -50,8 +50,8 @@
   --space-3xl: 4rem;      /* 64px */
   
   /* Typography */
-  --font-family-primary: 'Georgia', 'Times New Roman', serif;
-  --font-family-secondary: 'Arial', 'Helvetica', sans-serif;
+  --font-family-primary: 'Merriweather', 'Noto Serif', 'Georgia', serif;
+  --font-family-secondary: 'Noto Serif', 'Georgia', serif;
   --font-family-mono: 'Courier New', monospace;
   
   --font-size-xs: 0.75rem;    /* 12px */

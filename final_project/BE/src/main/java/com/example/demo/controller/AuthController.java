@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.request.LoginRequest;
 import com.example.demo.dto.request.RegisterRequest;
 import com.example.demo.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,12 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
         return authService.login(request);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
         return authService.register(request);
     }
 

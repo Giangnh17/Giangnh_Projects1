@@ -15,7 +15,7 @@ const Components = {
         <div class="sidebar-header">
           <a href="./dashboard.html" class="sidebar-logo">
             <span class="sidebar-logo-icon">📚</span>
-            <span class="sidebar-logo-text">Bibliotheca</span>
+            <span class="sidebar-logo-text">Sarly</span>
           </a>
           <button class="sidebar-toggle hide-md" id="sidebarToggle">
             <i class="fas fa-bars"></i>

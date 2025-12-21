@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản Lý Sách - Bibliotheca Library</title>
+  <title>Quản Lý Sách - Sarly Library</title>
   
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Noto+Serif:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS -->
   <link rel="stylesheet" href="./assets/css/variables.css">
@@ -13,6 +18,7 @@
   <link rel="stylesheet" href="./assets/css/components.css">
   <link rel="stylesheet" href="./assets/css/layout.css">
   <link rel="stylesheet" href="./assets/css/responsive.css">
+  <link rel="stylesheet" href="./assets/css/pages/books.css">
   
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -52,14 +58,22 @@
               <div class="col col-md-3">
                 <select class="form-control" id="categoryFilter">
                   <option value="all">Tất cả thể loại</option>
+                  <option value="Văn học">Văn học</option>
+                  <option value="Khoa học">Khoa học</option>
+                  <option value="Lịch sử">Lịch sử</option>
+                  <option value="Triết học">Triết học</option>
+                  <option value="Kinh tế">Kinh tế</option>
+                  <option value="Công nghệ">Công nghệ</option>
+                  <option value="Nghệ thuật">Nghệ thuật</option>
+                  <option value="Khác">Khác</option>
                 </select>
               </div>
               <div class="col col-md-3">
                 <select class="form-control" id="sortBy">
                   <option value="title">Sắp xếp: Tên A-Z</option>
                   <option value="author">Sắp xếp: Tác giả</option>
-                  <option value="year">Sắp xếp: Năm xuất bản</option>
-                  <option value="available">Sắp xếp: Số lượng</option>
+                  <option value="category">Sắp xếp: Thể loại</option>
+                  <option value="status">Sắp xếp: Trạng thái</option>
                 </select>
               </div>
             </div>
@@ -90,16 +104,10 @@
         <input type="hidden" id="bookId">
         
         <div class="row">
-          <div class="col col-md-6">
+          <div class="col col-md-12">
             <div class="form-group">
               <label for="title" class="form-label required">Tên sách</label>
-              <input type="text" id="title" class="form-control" required>
-            </div>
-          </div>
-          <div class="col col-md-6">
-            <div class="form-group">
-              <label for="author" class="form-label required">Tác giả</label>
-              <input type="text" id="author" class="form-control" required>
+              <input type="text" id="title" class="form-control" required placeholder="Nhập tên sách">
             </div>
           </div>
         </div>
@@ -107,51 +115,40 @@
         <div class="row">
           <div class="col col-md-6">
             <div class="form-group">
-              <label for="isbn" class="form-label required">ISBN</label>
-              <input type="text" id="isbn" class="form-control" placeholder="978-0-123456-78-9" required>
+              <label for="author" class="form-label required">Tác giả</label>
+              <input type="text" id="author" class="form-control" required placeholder="Nhập tên tác giả">
             </div>
           </div>
           <div class="col col-md-6">
             <div class="form-group">
               <label for="category" class="form-label required">Thể loại</label>
-              <input type="text" id="category" class="form-control" required>
+              <select id="category" class="form-control" required>
+                <option value="">Chọn thể loại</option>
+                <option value="Văn học">Văn học</option>
+                <option value="Khoa học">Khoa học</option>
+                <option value="Lịch sử">Lịch sử</option>
+                <option value="Triết học">Triết học</option>
+                <option value="Kinh tế">Kinh tế</option>
+                <option value="Công nghệ">Công nghệ</option>
+                <option value="Nghệ thuật">Nghệ thuật</option>
+                <option value="Khác">Khác</option>
+              </select>
             </div>
           </div>
         </div>
 
         <div class="row">
-          <div class="col col-md-6">
+          <div class="col col-md-12">
             <div class="form-group">
-              <label for="publisher" class="form-label required">Nhà xuất bản</label>
-              <input type="text" id="publisher" class="form-control" required>
+              <label for="status" class="form-label required">Trạng thái</label>
+              <select id="status" class="form-control" required>
+                <option value="">Chọn trạng thái</option>
+                <option value="AVAILABLE">Có sẵn</option>
+                <option value="BORROWED">Đang mượn</option>
+                <option value="UNAVAILABLE">Không có sẵn</option>
+              </select>
             </div>
           </div>
-          <div class="col col-md-6">
-            <div class="form-group">
-              <label for="publishedYear" class="form-label required">Năm xuất bản</label>
-              <input type="number" id="publishedYear" class="form-control" min="1900" max="2100" required>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col col-md-6">
-            <div class="form-group">
-              <label for="quantity" class="form-label required">Số lượng</label>
-              <input type="number" id="quantity" class="form-control" min="0" required>
-            </div>
-          </div>
-          <div class="col col-md-6">
-            <div class="form-group">
-              <label for="available" class="form-label required">Có sẵn</label>
-              <input type="number" id="available" class="form-control" min="0" required>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="description" class="form-label">Mô tả</label>
-          <textarea id="description" class="form-control" rows="3"></textarea>
         </div>
       </form>
     </div>
@@ -250,15 +247,7 @@
 
     // Populate category filter
     function populateCategoryFilter() {
-      const categories = BooksAPI.getCategories(allBooks);
-      const filterSelect = document.getElementById('categoryFilter');
-      
-      categories.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat;
-        option.textContent = cat;
-        filterSelect.appendChild(option);
-      });
+      // Categories are now hardcoded in HTML select
     }
 
     // Filter and render books
@@ -286,10 +275,10 @@
             return a.title.localeCompare(b.title);
           case 'author':
             return a.author.localeCompare(b.author);
-          case 'year':
-            return (b.publishedYear || 0) - (a.publishedYear || 0);
-          case 'available':
-            return (b.available || 0) - (a.available || 0);
+          case 'category':
+            return a.category.localeCompare(b.category);
+          case 'status':
+            return a.status.localeCompare(b.status);
           default:
             return 0;
         }
@@ -319,12 +308,9 @@
                 <th>ID</th>
                 <th>Tên sách</th>
                 <th>Tác giả</th>
-                <th>ISBN</th>
                 <th>Thể loại</th>
-                <th>Năm XB</th>
-                <th>Số lượng</th>
-                <th>Có sẵn</th>
-                ${canEdit ? '<th>Thao tác</th>' : ''}
+                <th>Trạng thái</th>
+                ${canEdit ? '<th style="width: 150px;">Thao tác</th>' : ''}
               </tr>
             </thead>
             <tbody>
@@ -333,25 +319,15 @@
                   <td>${book.id}</td>
                   <td>
                     <strong>${Utils.escapeHtml(book.title)}</strong>
-                    ${book.description ? `<br><small class="text-secondary">${Utils.truncate(book.description, 50)}</small>` : ''}
                   </td>
                   <td>${Utils.escapeHtml(book.author)}</td>
-                  <td><code>${Utils.escapeHtml(book.isbn)}</code></td>
                   <td><span class="badge badge-primary">${Utils.escapeHtml(book.category)}</span></td>
-                  <td>${book.publishedYear}</td>
-                  <td>${book.quantity}</td>
                   <td>
-                    ${book.available > 0 
-                      ? `<span class="badge badge-success">${book.available}</span>` 
-                      : '<span class="badge badge-warning">0</span>'
-                    }
+                    ${getStatusBadge(book.status)}
                   </td>
                   ${canEdit ? `
                     <td>
                       <div class="table-actions">
-                        <button class="btn btn-sm btn-outline" onclick="viewBook(${book.id})" title="Xem chi tiết">
-                          <i class="fas fa-eye"></i>
-                        </button>
                         <button class="btn btn-sm btn-primary" onclick="editBook(${book.id})" title="Sửa">
                           <i class="fas fa-edit"></i>
                         </button>
@@ -369,6 +345,18 @@
       `;
 
       container.innerHTML = tableHTML;
+    }
+
+    // Get status badge HTML
+    function getStatusBadge(status) {
+      const statusMap = {
+        'AVAILABLE': { label: 'Có sẵn', class: 'success' },
+        'BORROWED': { label: 'Đang mượn', class: 'warning' },
+        'UNAVAILABLE': { label: 'Không có sẵn', class: 'danger' }
+      };
+      
+      const statusInfo = statusMap[status] || { label: status, class: 'info' };
+      return `<span class="badge badge-${statusInfo.class}">${statusInfo.label}</span>`;
     }
 
     // Open book modal (for create)
@@ -392,28 +380,6 @@
       Validator.clearAllErrors(document.getElementById('bookForm'));
     }
 
-    // View book details
-    function viewBook(id) {
-      const book = allBooks.find(b => b.id === id);
-      if (!book) return;
-
-      const message = `
-        <div style="text-align: left;">
-          <p><strong>Tên sách:</strong> ${book.title}</p>
-          <p><strong>Tác giả:</strong> ${book.author}</p>
-          <p><strong>ISBN:</strong> ${book.isbn}</p>
-          <p><strong>Nhà xuất bản:</strong> ${book.publisher}</p>
-          <p><strong>Năm xuất bản:</strong> ${book.publishedYear}</p>
-          <p><strong>Thể loại:</strong> ${book.category}</p>
-          <p><strong>Số lượng:</strong> ${book.quantity}</p>
-          <p><strong>Có sẵn:</strong> ${book.available}</p>
-          ${book.description ? `<p><strong>Mô tả:</strong> ${book.description}</p>` : ''}
-        </div>
-      `;
-
-      Toast.info(message, 8000);
-    }
-
     // Edit book
     function editBook(id) {
       if (!Auth.hasRole('LIBRARIAN')) {
@@ -431,13 +397,8 @@
       document.getElementById('bookId').value = book.id;
       document.getElementById('title').value = book.title;
       document.getElementById('author').value = book.author;
-      document.getElementById('isbn').value = book.isbn;
       document.getElementById('category').value = book.category;
-      document.getElementById('publisher').value = book.publisher;
-      document.getElementById('publishedYear').value = book.publishedYear;
-      document.getElementById('quantity').value = book.quantity;
-      document.getElementById('available').value = book.available;
-      document.getElementById('description').value = book.description || '';
+      document.getElementById('status').value = book.status;
 
       Modal.show('bookModal');
     }
@@ -451,12 +412,8 @@
       let isValid = true;
       if (!Validator.validateRequired(document.getElementById('title'), 'Tên sách')) isValid = false;
       if (!Validator.validateRequired(document.getElementById('author'), 'Tác giả')) isValid = false;
-      if (!Validator.validateRequired(document.getElementById('isbn'), 'ISBN')) isValid = false;
       if (!Validator.validateRequired(document.getElementById('category'), 'Thể loại')) isValid = false;
-      if (!Validator.validateRequired(document.getElementById('publisher'), 'Nhà xuất bản')) isValid = false;
-      if (!Validator.validateNumber(document.getElementById('publishedYear'), 'Năm xuất bản')) isValid = false;
-      if (!Validator.validateNumber(document.getElementById('quantity'), 'Số lượng')) isValid = false;
-      if (!Validator.validateNumber(document.getElementById('available'), 'Có sẵn')) isValid = false;
+      if (!Validator.validateRequired(document.getElementById('status'), 'Trạng thái')) isValid = false;
 
       if (!isValid) return;
 
@@ -464,13 +421,8 @@
       const bookData = {
         title: document.getElementById('title').value.trim(),
         author: document.getElementById('author').value.trim(),
-        isbn: document.getElementById('isbn').value.trim(),
         category: document.getElementById('category').value.trim(),
-        publisher: document.getElementById('publisher').value.trim(),
-        publishedYear: parseInt(document.getElementById('publishedYear').value),
-        quantity: parseInt(document.getElementById('quantity').value),
-        available: parseInt(document.getElementById('available').value),
-        description: document.getElementById('description').value.trim()
+        status: document.getElementById('status').value
       };
 
       try {

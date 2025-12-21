@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.request.CreateBookRequest;
 import com.example.demo.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class AdminBookController {
     private BookService bookService;
 
     @PostMapping()
-    public ResponseEntity<?> products(@RequestBody CreateBookRequest request) {
+    public ResponseEntity<?> products(@RequestBody @Valid CreateBookRequest request) {
         return bookService.createBook(request);
     }
 }

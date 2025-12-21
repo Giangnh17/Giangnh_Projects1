@@ -39,12 +39,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             try {
                 username = jwtService.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-                System.out.println("Không thể lấy Token");
+                logger.error("Không thể lấy Token: " + e.getMessage());
             } catch (ExpiredJwtException e) {
-                System.out.println("Token đã hết hạn");
+                logger.error("Token đã hết hạn: " + e.getMessage());
             }
         } else {
-            logger.warn("Token không bắt đầu với Bearer String");
+            // Chỉ log warning nếu không phải endpoint public
+            String requestURI = request.getRequestURI();
+            if (!requestURI.startsWith("/auth/") && requestTokenHeader != null) {
+                logger.warn("Token không đúng format. Nhận được: " + requestTokenHeader);
+            }
         }
 
         // Khi có username từ token và chưa được authenticated
