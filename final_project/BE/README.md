@@ -882,19 +882,5 @@ Các file hướng dẫn chi tiết đã được tạo trong thư mục gốc:
 - [JWT.io](https://jwt.io/)
 - [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
 
----
 
-## 👨‍💻 Tác giả
-
-**Giangnh** - Final Project Backend
-
----
-
-## 📄 License
-
-This project is for educational purposes.
-
----
-
-**Happy Coding! 🚀**
 
