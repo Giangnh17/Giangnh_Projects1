@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.request.CreateBookRequest;
+import com.example.demo.dto.request.PageRequest;
 import com.example.demo.service.BookService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,8 @@ public class BookController {
 
     // GET /api/books - Lấy danh sách tất cả sách (Public - tất cả user có thể xem)
     @GetMapping
-    public ResponseEntity<?> getAllBooks(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return bookService.getAllBooks(page, size);
+    public ResponseEntity<?> getAllBooks(@ModelAttribute PageRequest pageRequest) {
+        return bookService.getAllBooks(pageRequest);
     }
 
     // GET /api/books/{id} - Lấy thông tin sách theo ID (Public - tất cả user có thể xem)

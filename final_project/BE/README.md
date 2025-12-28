@@ -3,48 +3,85 @@
 ## 📋 Mục lục
 - [Tổng quan dự án](#tổng-quan-dự-án)
 - [Công nghệ sử dụng](#công-nghệ-sử-dụng)
+- [Tính năng chính](#tính-năng-chính)
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
-- [Chi tiết các thành phần](#chi-tiết-các-thành-phần)
-- [Flow hoạt động](#flow-hoạt-động)
-- [Cấu hình và cài đặt](#cấu-hình-và-cài-đặt)
+- [Database Schema](#database-schema)
 - [API Endpoints](#api-endpoints)
-- [Bảo mật](#bảo-mật)
-- [Hướng dẫn chạy dự án](#hướng-dẫn-chạy-dự-án)
+- [Phân trang, Sắp xếp và Tìm kiếm](#phân-trang-sắp-xếp-và-tìm-kiếm)
+- [Authentication & Authorization](#authentication--authorization)
+- [Hướng dẫn cài đặt](#hướng-dẫn-cài-đặt)
+- [Tích hợp Frontend](#tích-hợp-frontend)
 
 ---
 
 ## 🎯 Tổng quan dự án
 
-Đây là một **RESTful API Backend** cho hệ thống quản lý thư viện (Library Management System) được xây dựng bằng **Spring Boot**. Hệ thống cung cấp các chức năng:
+**Library Management System Backend** là một RESTful API được xây dựng bằng **Spring Boot** để quản lý hệ thống thư viện. Dự án cung cấp đầy đủ các chức năng quản lý sách, người dùng với hệ thống phân quyền Role-Based Access Control (RBAC).
 
-- ✅ **Xác thực và phân quyền** (Authentication & Authorization) với JWT
-- ✅ **Quản lý sách** (Books Management) - CRUD operations với phân quyền theo role
-- ✅ **Quản lý người dùng** (User Management) với role-based access control
-- ✅ **Admin Dashboard** - Quản lý users, update role, soft delete
-- ✅ **User Profile Management** - Update password và full name
-- ✅ **Soft delete** cho các entity
-- ✅ **Automatic timestamp tracking** (createdAt, updatedAt)
-- ✅ **Global Exception Handler** - Error responses chuẩn và dễ hiểu
-- ✅ **Lazy Loading Fix** - JOIN FETCH để tối ưu performance
+### Các role trong hệ thống:
+- **ADMIN** - Quản trị viên hệ thống
+- **LIBRARIAN** - Thủ thư, quản lý sách
+- **USER** - Người dùng thông thường
 
 ---
 
 ## 🛠 Công nghệ sử dụng
 
-### Core Framework
-- **Spring Boot 4.0.0** - Framework chính
+### Backend Framework
+- **Spring Boot 3.x** - Framework chính
 - **Java 17** - Ngôn ngữ lập trình
+- **Maven** - Build tool và dependency management
 
-### Dependencies chính
+### Spring Modules
 - **Spring Data JPA** - ORM và database operations
 - **Spring Security** - Authentication & Authorization
-- **Spring Web MVC** - RESTful API
+- **Spring Web** - RESTful API
+- **Spring Validation** - Request validation
+
+### Security & Authentication
 - **JWT (JSON Web Token)** - Token-based authentication
-  - `jjwt-api:0.13.0`
-  - `jjwt-impl:0.13.0`
-  - `jjwt-jackson:0.13.0`
-- **MS SQL Server** - Database
+  - `io.jsonwebtoken:jjwt-api:0.13.0`
+  - `io.jsonwebtoken:jjwt-impl:0.13.0`
+  - `io.jsonwebtoken:jjwt-jackson:0.13.0`
 - **BCrypt** - Password encryption
+
+### Database
+- **MS SQL Server** - Relational Database
+- **Hibernate** - ORM implementation
+
+---
+
+## ✨ Tính năng chính
+
+### 1. Authentication & Authorization
+- ✅ Đăng ký tài khoản (Register)
+- ✅ Đăng nhập với JWT (Login)
+- ✅ Xác thực token (JWT validation)
+- ✅ Role-based access control (ADMIN, LIBRARIAN, USER)
+- ✅ Profile management
+
+### 2. Quản lý Sách (Books Management)
+- ✅ CRUD operations (Create, Read, Update, Delete)
+- ✅ Phân trang (Pagination)
+- ✅ Sắp xếp (Sorting) theo các field
+- ✅ Tìm kiếm (Search) theo title, author, category
+- ✅ Phân quyền: Public xem, ADMIN/LIBRARIAN quản lý
+
+### 3. Quản lý Người dùng (User Management)
+- ✅ Xem danh sách users với phân trang, sắp xếp, tìm kiếm
+- ✅ Update role user (chỉ ADMIN)
+- ✅ Soft delete user (chỉ ADMIN)
+- ✅ Update password (USER, LIBRARIAN)
+- ✅ Update full name (USER, LIBRARIAN)
+- ✅ Bảo vệ: Không thể xóa hoặc thay đổi ADMIN
+
+### 4. Tính năng kỹ thuật
+- ✅ Soft delete pattern (isDeleted flag)
+- ✅ Automatic timestamps (createdAt, updatedAt)
+- ✅ Global Exception Handler
+- ✅ CORS configuration
+- ✅ Input validation với Jakarta Validation
+- ✅ JOIN FETCH để tránh N+1 query problem
 
 ---
 
@@ -52,9 +89,591 @@
 
 ```
 src/main/java/com/example/demo/
+├── config/                          # Cấu hình
+│   ├── SecurityConfig.java          # Spring Security configuration
+│   ├── JwtService.java              # JWT token service
+│   ├── JwtAuthFilter.java           # JWT authentication filter
+│   ├── CustomUserDetailsService.java # Custom UserDetails service
+│   ├── DataInitializer.java         # Khởi tạo dữ liệu ban đầu
+│   └── GlobalExceptionHandler.java  # Xử lý exception toàn cục
 │
-├── config/                          # ⚙️ Configuration & Security
-│   ├── CustomUserDetailsService.java    - Load user từ database với JOIN FETCH
+├── controller/                      # REST Controllers
+│   ├── AuthController.java          # Auth endpoints (login, register, profile)
+│   ├── BookController.java          # Book management endpoints
+│   ├── AdminController.java         # Admin management endpoints
+│   └── UserController.java          # User profile endpoints
+│
+├── service/                         # Service Interfaces
+│   ├── AuthService.java
+│   ├── BookService.java
+│   ├── AdminService.java
+│   ├── UserService.java
+│   └── impl/                        # Service Implementations
+│       ├── AuthServiceImpl.java
+│       ├── BookServiceImpl.java
+│       ├── AdminServiceImpl.java
+│       └── UserServiceImpl.java
+│
+├── repository/                      # JPA Repositories
+│   ├── UserRepository.java
+│   ├── BookRepository.java
+│   └── RoleRepository.java
+│
+├── entity/                          # JPA Entities
+│   ├── BaseEntity.java              # Base class với id, timestamps, isDeleted
+│   ├── User.java
+│   ├── Book.java
+│   └── Role.java
+│
+├── dto/                             # Data Transfer Objects
+│   ├── request/
+│   │   ├── LoginRequest.java
+│   │   ├── RegisterRequest.java
+│   │   ├── CreateBookRequest.java
+│   │   ├── UpdateUserRoleRequest.java
+│   │   ├── UpdatePasswordRequest.java
+│   │   ├── UpdateFullNameRequest.java
+│   │   └── PageRequest.java         # DTO cho pagination, sorting, search
+│   └── response/
+│       ├── UserProfileResponse.java
+│       └── PageResponse.java        # Generic response cho pagination
+│
+└── FinalProjectApplication.java     # Main application class
+
+src/main/resources/
+├── application.properties           # Configuration
+├── data-init.sql                    # SQL khởi tạo dữ liệu
+└── verify-data.sql                  # SQL kiểm tra dữ liệu
+```
+
+---
+
+## 🗄 Database Schema
+
+### Table: `users`
+```sql
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY IDENTITY(1,1),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255),
+    role_id BIGINT,
+    create_at DATETIME2,
+    update_at DATETIME2,
+    is_deleted BIT DEFAULT 0,
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+```
+
+### Table: `books`
+```sql
+CREATE TABLE books (
+    id BIGINT PRIMARY KEY IDENTITY(1,1),
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    status VARCHAR(50),
+    create_at DATETIME2,
+    update_at DATETIME2,
+    is_deleted BIT DEFAULT 0
+);
+```
+
+### Table: `roles`
+```sql
+CREATE TABLE roles (
+    id BIGINT PRIMARY KEY IDENTITY(1,1),
+    role_name VARCHAR(50) NOT NULL UNIQUE
+);
+```
+
+### Dữ liệu mặc định
+```sql
+-- Roles
+INSERT INTO roles (role_name) VALUES ('ROLE_ADMIN'), ('ROLE_LIBRARIAN'), ('ROLE_USER');
+
+-- Admin account (password: admin123)
+INSERT INTO users (email, password, full_name, role_id, create_at, update_at, is_deleted)
+VALUES ('admin@library.com', '$2a$10$...', 'System Admin', 1, GETDATE(), GETDATE(), 0);
+```
+
+---
+
+## 🌐 API Endpoints
+
+### 🔐 Authentication APIs (`/auth`)
+
+#### 1. Register
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "name": "Nguyen Van A",
+    "password": "password123"
+}
+
+Response: 200 OK
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "role": "ROLE_USER"
+}
+```
+
+#### 2. Login
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@library.com",
+    "password": "admin123"
+}
+
+Response: 200 OK
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "role": "ROLE_ADMIN"
+}
+```
+
+#### 3. Get Profile
+```http
+GET /auth/profile
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+    "id": 1,
+    "email": "admin@library.com",
+    "fullName": "System Admin",
+    "role": "ROLE_ADMIN"
+}
+```
+
+---
+
+### 📚 Book APIs (`/api/books`)
+
+#### 1. Get All Books (Public + Pagination + Sorting + Search)
+```http
+GET /api/books?page=0&size=10&sortBy=title&sortDirection=ASC&search=java
+
+Query Parameters:
+- page: Số trang (default: 0)
+- size: Số items mỗi trang (default: 10, max: 100)
+- sortBy: Field để sắp xếp (id, title, author, category, status)
+- sortDirection: ASC hoặc DESC (default: ASC)
+- search: Từ khóa tìm kiếm (tìm trong title, author, category)
+
+Response: 200 OK
+{
+    "content": [
+        {
+            "id": 1,
+            "title": "Java Programming",
+            "author": "John Doe",
+            "category": "Programming",
+            "status": "AVAILABLE",
+            "createAt": "2024-01-01T10:00:00",
+            "updateAt": "2024-01-01T10:00:00"
+        }
+    ],
+    "pageNumber": 0,
+    "pageSize": 10,
+    "totalElements": 50,
+    "totalPages": 5,
+    "last": false,
+    "first": true
+}
+```
+
+#### 2. Get Book By ID (Public)
+```http
+GET /api/books/{id}
+
+Response: 200 OK
+{
+    "id": 1,
+    "title": "Java Programming",
+    "author": "John Doe",
+    "category": "Programming",
+    "status": "AVAILABLE"
+}
+```
+
+#### 3. Create Book (ADMIN, LIBRARIAN only)
+```http
+POST /api/books
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+    "title": "Spring Boot Guide",
+    "author": "Jane Smith",
+    "category": "Framework",
+    "status": "AVAILABLE"
+}
+
+Response: 201 Created
+{
+    "id": 2,
+    "title": "Spring Boot Guide",
+    "author": "Jane Smith",
+    "category": "Framework",
+    "status": "AVAILABLE"
+}
+```
+
+#### 4. Update Book (ADMIN, LIBRARIAN only)
+```http
+PUT /api/books/{id}
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+    "title": "Spring Boot Guide - Updated",
+    "author": "Jane Smith",
+    "category": "Framework",
+    "status": "BORROWED"
+}
+
+Response: 200 OK
+```
+
+#### 5. Delete Book (ADMIN, LIBRARIAN only)
+```http
+DELETE /api/books/{id}
+Authorization: Bearer <token>
+
+Response: 200 OK
+"Book deleted successfully"
+```
+
+---
+
+### 👥 Admin APIs (`/admin`) - ADMIN Only
+
+#### 1. Get All Users (Pagination + Sorting + Search)
+```http
+GET /admin/users?page=0&size=10&sortBy=email&sortDirection=ASC&search=nguyen
+
+Query Parameters:
+- page: Số trang (default: 0)
+- size: Số items mỗi trang (default: 10)
+- sortBy: Field để sắp xếp (id, email, fullName, createAt)
+- sortDirection: ASC hoặc DESC (default: ASC)
+- search: Từ khóa tìm kiếm (tìm trong email, fullName)
+
+Response: 200 OK
+{
+    "content": [
+        {
+            "id": 2,
+            "email": "user@example.com",
+            "fullName": "Nguyen Van A",
+            "role": {
+                "id": 3,
+                "roleName": "ROLE_USER"
+            },
+            "deleted": false
+        }
+    ],
+    "pageNumber": 0,
+    "pageSize": 10,
+    "totalElements": 15,
+    "totalPages": 2,
+    "last": false,
+    "first": true
+}
+```
+
+#### 2. Update User Role
+```http
+PUT /admin/users/{userId}/role
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+    "roleName": "ROLE_LIBRARIAN"
+}
+
+Response: 200 OK
+"Cập nhật role thành công"
+```
+
+#### 3. Soft Delete User
+```http
+DELETE /admin/users/{userId}
+Authorization: Bearer <token>
+
+Response: 200 OK
+"Xóa user thành công"
+
+Note: Không thể xóa ADMIN
+```
+
+---
+
+### 👤 User Profile APIs (`/api/user`) - USER, LIBRARIAN
+
+#### 1. Update Password
+```http
+PUT /api/user/password
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+    "oldPassword": "oldpass123",
+    "newPassword": "newpass456"
+}
+
+Response: 200 OK
+"Cập nhật mật khẩu thành công"
+
+Note: ADMIN không được phép dùng API này
+```
+
+#### 2. Update Full Name
+```http
+PUT /api/user/fullname
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+    "fullName": "Nguyen Van B"
+}
+
+Response: 200 OK
+"Cập nhật tên thành công"
+
+Note: ADMIN không được phép dùng API này
+```
+
+---
+
+## 📄 Phân trang, Sắp xếp và Tìm kiếm
+
+### PageRequest DTO
+```java
+public class PageRequest {
+    private int page = 0;              // Trang hiện tại (bắt đầu từ 0)
+    private int size = 10;             // Số items mỗi trang (max: 100)
+    private String sortBy;             // Field để sort (vd: "title", "email")
+    private String sortDirection = "ASC"; // "ASC" hoặc "DESC"
+    private String search;             // Từ khóa tìm kiếm
+}
+```
+
+### PageResponse<T> - Generic Response
+```java
+public class PageResponse<T> {
+    private List<T> content;          // Danh sách items
+    private int pageNumber;           // Trang hiện tại
+    private int pageSize;             // Số items mỗi trang
+    private long totalElements;       // Tổng số items
+    private int totalPages;           // Tổng số trang
+    private boolean last;             // Có phải trang cuối không
+    private boolean first;            // Có phải trang đầu không
+}
+```
+
+### Cách sử dụng
+
+#### Backend - Repository Layer
+```java
+@Query("SELECT b FROM Book b WHERE " +
+       "LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+       "LOWER(b.author) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+       "LOWER(b.category) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+Page<Book> searchBooks(@Param("keyword") String keyword, Pageable pageable);
+```
+
+#### Backend - Service Layer
+```java
+// Tạo Pageable với sorting
+Pageable pageable;
+if (pageRequest.getSortBy() != null && !pageRequest.getSortBy().isEmpty()) {
+    Sort sort = Sort.by(
+        "DESC".equalsIgnoreCase(pageRequest.getSortDirection()) 
+            ? Sort.Direction.DESC 
+            : Sort.Direction.ASC,
+        pageRequest.getSortBy()
+    );
+    pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
+} else {
+    pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize());
+}
+
+// Tìm kiếm hoặc lấy tất cả
+Page<Book> bookPage;
+if (pageRequest.getSearch() != null && !pageRequest.getSearch().trim().isEmpty()) {
+    bookPage = bookRepository.searchBooks(pageRequest.getSearch().trim(), pageable);
+} else {
+    bookPage = bookRepository.findAll(pageable);
+}
+```
+
+#### Frontend - HTTP Request
+```javascript
+// Example với Fetch API
+const fetchBooks = async (page = 0, size = 10, sortBy = 'title', sortDirection = 'ASC', search = '') => {
+    const params = new URLSearchParams({
+        page: page,
+        size: size,
+        sortBy: sortBy,
+        sortDirection: sortDirection,
+        search: search
+    });
+    
+    const response = await fetch(`/api/books?${params}`);
+    const data = await response.json();
+    return data;
+};
+
+// Sử dụng
+fetchBooks(0, 10, 'title', 'ASC', 'java')
+    .then(data => {
+        console.log('Books:', data.content);
+        console.log('Total pages:', data.totalPages);
+    });
+```
+
+---
+
+## 🔒 Authentication & Authorization
+
+### JWT Token
+- **Thuật toán**: HS256 (HMAC with SHA-256)
+- **Secret Key**: Được config trong `application.properties`
+- **Expiration**: 5 hours (cấu hình được)
+- **Header**: `Authorization: Bearer <token>`
+
+### Token Structure
+```json
+{
+    "sub": "user@example.com",    // Username (email)
+    "role": "ROLE_USER",           // User role
+    "iat": 1234567890,             // Issued at
+    "exp": 1234585890              // Expiration
+}
+```
+
+### Security Configuration
+
+#### Public Endpoints (không cần token)
+- `POST /auth/login`
+- `POST /auth/register`
+- `GET /api/books` (xem danh sách sách)
+- `GET /api/books/{id}` (xem chi tiết sách)
+
+#### Protected Endpoints
+
+**ADMIN only:**
+- `GET /admin/users`
+- `PUT /admin/users/{userId}/role`
+- `DELETE /admin/users/{userId}`
+
+**ADMIN + LIBRARIAN:**
+- `POST /api/books`
+- `PUT /api/books/{id}`
+- `DELETE /api/books/{id}`
+
+**USER + LIBRARIAN:**
+- `PUT /api/user/password`
+- `PUT /api/user/fullname`
+
+**All authenticated:**
+- `GET /auth/profile`
+
+### Password Encryption
+- Sử dụng **BCrypt** với strength 10
+- Password được hash trước khi lưu database
+- Không thể reverse engineer từ hash
+
+---
+
+## 🚀 Hướng dẫn cài đặt
+
+### 1. Prerequisites
+- Java JDK 17 trở lên
+- MS SQL Server
+- Maven 3.6+
+- IDE (IntelliJ IDEA, Eclipse, hoặc VS Code)
+
+### 2. Clone project
+```bash
+git clone <repository-url>
+cd final_project/BE
+```
+
+### 3. Cấu hình Database
+
+#### Tạo database
+```sql
+CREATE DATABASE FINAL_PROJECT;
+```
+
+#### Cập nhật `application.properties`
+```properties
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=FINAL_PROJECT;encrypt=false;trustServerCertificate=true
+spring.datasource.username=sa
+spring.datasource.password=your_password
+spring.jpa.hibernate.ddl-auto=update
+```
+
+### 4. Build và Run
+
+#### Sử dụng Maven
+```bash
+# Build project
+./mvnw clean install
+
+# Run application
+./mvnw spring-boot:run
+```
+
+#### Hoặc chạy từ IDE
+- Import project as Maven project
+- Run `FinalProjectApplication.java`
+
+### 5. Khởi tạo dữ liệu mẫu
+
+Chạy script SQL:
+```bash
+# Windows PowerShell
+.\load-data.ps1
+
+# Linux/Mac
+./load-data.sh
+
+# Windows Command Prompt
+load-data.bat
+```
+
+Hoặc chạy thủ công file `src/main/resources/data-init.sql`
+
+### 6. Verify Installation
+
+Server sẽ chạy tại: `http://localhost:8086`
+
+Test với curl:
+```bash
+# Test login
+curl -X POST http://localhost:8086/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@library.com","password":"admin123"}'
+
+# Test get books
+curl http://localhost:8086/api/books?page=0&size=10
+```
+
+---
+
+## 🌍 Tích hợp Frontend
+
+### React Example
 │   ├── DataInitializer.java             - Khởi tạo dữ liệu mặc định (Admin, Librarian, User)
 │   ├── GlobalExceptionHandler.java      - ✨ NEW: Xử lý validation errors
 │   ├── JwtAuthFilter.java               - Filter xác thực JWT
@@ -423,6 +1042,484 @@ jwt.expiration=1m                           # Token hết hạn sau 1 phút (dem
   - **Admin**: `admin@gmail.com` / `admin`
   - **Librarian**: `librarian@gmail.com` / `librarian`
   - **User**: `user@gmail.com` / `user`
+
+---
+
+## 📄 Phân trang, Sắp xếp và Tìm kiếm
+
+### Overview
+Dự án hỗ trợ đầy đủ các tính năng:
+- **Pagination** (Phân trang) - Chia dữ liệu thành nhiều trang
+- **Sorting** (Sắp xếp) - Sắp xếp theo field bất kỳ
+- **Search** (Tìm kiếm) - Tìm kiếm full-text
+
+### PageRequest DTO
+```java
+public class PageRequest {
+    private int page = 0;              // Trang hiện tại (bắt đầu từ 0)
+    private int size = 10;             // Số items mỗi trang (1-100)
+    private String sortBy;             // Field để sort (ví dụ: "title", "email")
+    private String sortDirection = "ASC"; // "ASC" hoặc "DESC"
+    private String search;             // Từ khóa tìm kiếm
+    
+    // Getters, Setters với validation
+    // - page: không âm
+    // - size: 1-100
+    // - sortDirection: chỉ ASC/DESC
+}
+```
+
+### PageResponse<T> - Generic Response
+```java
+public class PageResponse<T> {
+    private List<T> content;          // Danh sách items của trang hiện tại
+    private int pageNumber;           // Trang hiện tại (0-based)
+    private int pageSize;             // Số items mỗi trang
+    private long totalElements;       // Tổng số items trong database
+    private int totalPages;           // Tổng số trang
+    private boolean last;             // Có phải trang cuối không
+    private boolean first;            // Có phải trang đầu không
+}
+```
+
+### Repository Layer - Search Queries
+
+#### BookRepository - Tìm kiếm sách
+```java
+@Query("SELECT b FROM Book b WHERE " +
+       "LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+       "LOWER(b.author) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+       "LOWER(b.category) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+Page<Book> searchBooks(@Param("keyword") String keyword, Pageable pageable);
+```
+**Giải thích:**
+- `LOWER()` - Không phân biệt hoa thường
+- `CONCAT('%', :keyword, '%')` - Tìm kiếm có chứa keyword
+- Tìm trong 3 fields: title, author, category
+
+#### UserRepository - Tìm kiếm user
+```java
+@Query("SELECT u FROM User u WHERE " +
+       "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+       "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+Page<User> searchUsers(@Param("keyword") String keyword, Pageable pageable);
+```
+**Giải thích:**
+- Tìm trong email và fullName
+- Case-insensitive search
+
+### Service Layer - Logic xử lý
+
+```java
+@Override
+public ResponseEntity<?> getAllBooks(PageRequest pageRequest) {
+    try {
+        Pageable pageable;
+        
+        // Tạo Pageable với sorting nếu có sortBy
+        if (pageRequest.getSortBy() != null && !pageRequest.getSortBy().isEmpty()) {
+            Sort sort = Sort.by(
+                "DESC".equalsIgnoreCase(pageRequest.getSortDirection()) 
+                    ? Sort.Direction.DESC 
+                    : Sort.Direction.ASC,
+                pageRequest.getSortBy()
+            );
+            pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
+        } else {
+            pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize());
+        }
+        
+        Page<Book> bookPage;
+        
+        // Kiểm tra có search keyword không
+        if (pageRequest.getSearch() != null && !pageRequest.getSearch().trim().isEmpty()) {
+            // Có search -> dùng searchBooks
+            bookPage = bookRepository.searchBooks(pageRequest.getSearch().trim(), pageable);
+        } else {
+            // Không search -> lấy tất cả
+            bookPage = bookRepository.findAll(pageable);
+        }
+        
+        // Map sang PageResponse
+        PageResponse<Book> response = new PageResponse<>(
+            bookPage.getContent(),
+            bookPage.getNumber(),
+            bookPage.getSize(),
+            bookPage.getTotalElements(),
+            bookPage.getTotalPages(),
+            bookPage.isLast(),
+            bookPage.isFirst()
+        );
+        
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Error: " + e.getMessage());
+    }
+}
+```
+
+### Controller Layer - Nhận parameters
+
+```java
+@GetMapping
+public ResponseEntity<?> getAllBooks(@ModelAttribute PageRequest pageRequest) {
+    return bookService.getAllBooks(pageRequest);
+}
+```
+**Giải thích:**
+- `@ModelAttribute` - Tự động bind query parameters vào PageRequest object
+- Không cần Lombok, chỉ cần có getter/setter và no-arg constructor
+
+### API Request Examples
+
+#### 1. Lấy trang đầu tiên (mặc định)
+```http
+GET /api/books
+```
+Response:
+```json
+{
+    "content": [...],
+    "pageNumber": 0,
+    "pageSize": 10,
+    "totalElements": 50,
+    "totalPages": 5,
+    "first": true,
+    "last": false
+}
+```
+
+#### 2. Lấy trang thứ 2, mỗi trang 20 items
+```http
+GET /api/books?page=1&size=20
+```
+
+#### 3. Sắp xếp theo title, tăng dần
+```http
+GET /api/books?sortBy=title&sortDirection=ASC
+```
+
+#### 4. Sắp xếp theo author, giảm dần
+```http
+GET /api/books?sortBy=author&sortDirection=DESC
+```
+
+#### 5. Tìm kiếm sách có chứa "java"
+```http
+GET /api/books?search=java
+```
+
+#### 6. Kết hợp tất cả: Tìm "java", sắp xếp theo title, trang 2, 15 items/trang
+```http
+GET /api/books?search=java&sortBy=title&sortDirection=ASC&page=1&size=15
+```
+
+### Frontend Integration
+
+#### JavaScript (Vanilla)
+```javascript
+async function fetchBooks(page = 0, size = 10, sortBy = '', sortDirection = 'ASC', search = '') {
+    const params = new URLSearchParams({
+        page: page,
+        size: size,
+        ...(sortBy && { sortBy: sortBy }),
+        ...(sortDirection && { sortDirection: sortDirection }),
+        ...(search && { search: search })
+    });
+    
+    const response = await fetch(`http://localhost:8086/api/books?${params}`);
+    const data = await response.json();
+    
+    console.log('Books:', data.content);
+    console.log('Total pages:', data.totalPages);
+    console.log('Total items:', data.totalElements);
+    
+    return data;
+}
+
+// Sử dụng
+fetchBooks(0, 10, 'title', 'ASC', 'java');
+```
+
+#### React Example
+```jsx
+import React, { useState, useEffect } from 'react';
+
+function BookList() {
+    const [books, setBooks] = useState([]);
+    const [pagination, setPagination] = useState({
+        pageNumber: 0,
+        pageSize: 10,
+        totalPages: 0,
+        totalElements: 0
+    });
+    const [search, setSearch] = useState('');
+    const [sortBy, setSortBy] = useState('title');
+    const [sortDirection, setSortDirection] = useState('ASC');
+
+    useEffect(() => {
+        fetchBooks();
+    }, [pagination.pageNumber, sortBy, sortDirection, search]);
+
+    const fetchBooks = async () => {
+        const params = new URLSearchParams({
+            page: pagination.pageNumber,
+            size: pagination.pageSize,
+            sortBy: sortBy,
+            sortDirection: sortDirection,
+            search: search
+        });
+
+        const response = await fetch(`http://localhost:8086/api/books?${params}`);
+        const data = await response.json();
+        
+        setBooks(data.content);
+        setPagination({
+            pageNumber: data.pageNumber,
+            pageSize: data.pageSize,
+            totalPages: data.totalPages,
+            totalElements: data.totalElements
+        });
+    };
+
+    return (
+        <div>
+            {/* Search box */}
+            <input 
+                type="text"
+                placeholder="Tìm kiếm sách..."
+                value={search}
+                onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPagination(prev => ({ ...prev, pageNumber: 0 })); // Reset về trang đầu
+                }}
+            />
+            
+            {/* Sort controls */}
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="title">Tiêu đề</option>
+                <option value="author">Tác giả</option>
+                <option value="category">Thể loại</option>
+            </select>
+            
+            <button onClick={() => setSortDirection(sortDirection === 'ASC' ? 'DESC' : 'ASC')}>
+                {sortDirection === 'ASC' ? '↑' : '↓'}
+            </button>
+            
+            {/* Book list */}
+            <div className="book-list">
+                {books.map(book => (
+                    <div key={book.id} className="book-item">
+                        <h3>{book.title}</h3>
+                        <p>Tác giả: {book.author}</p>
+                        <p>Thể loại: {book.category}</p>
+                        <p>Trạng thái: {book.status}</p>
+                    </div>
+                ))}
+            </div>
+            
+            {/* Pagination controls */}
+            <div className="pagination">
+                <button 
+                    disabled={pagination.pageNumber === 0}
+                    onClick={() => setPagination(prev => ({ 
+                        ...prev, 
+                        pageNumber: prev.pageNumber - 1 
+                    }))}
+                >
+                    ← Trang trước
+                </button>
+                
+                <span>
+                    Trang {pagination.pageNumber + 1} / {pagination.totalPages}
+                    ({pagination.totalElements} sách)
+                </span>
+                
+                <button 
+                    disabled={pagination.pageNumber >= pagination.totalPages - 1}
+                    onClick={() => setPagination(prev => ({ 
+                        ...prev, 
+                        pageNumber: prev.pageNumber + 1 
+                    }))}
+                >
+                    Trang sau →
+                </button>
+            </div>
+        </div>
+    );
+}
+
+export default BookList;
+```
+
+#### Angular Example
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+
+interface PageResponse<T> {
+  content: T[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+}
+
+@Component({
+  selector: 'app-book-list',
+  template: `
+    <div>
+      <input [(ngModel)]="search" (ngModelChange)="onSearchChange()" 
+             placeholder="Tìm kiếm...">
+      
+      <select [(ngModel)]="sortBy" (ngModelChange)="loadBooks()">
+        <option value="title">Tiêu đề</option>
+        <option value="author">Tác giả</option>
+      </select>
+      
+      <button (click)="toggleSort()">
+        {{ sortDirection === 'ASC' ? '↑' : '↓' }}
+      </button>
+      
+      <div *ngFor="let book of books">
+        <h3>{{ book.title }}</h3>
+        <p>{{ book.author }}</p>
+      </div>
+      
+      <button [disabled]="pageNumber === 0" (click)="previousPage()">
+        Trước
+      </button>
+      <span>Trang {{ pageNumber + 1 }} / {{ totalPages }}</span>
+      <button [disabled]="pageNumber >= totalPages - 1" (click)="nextPage()">
+        Sau
+      </button>
+    </div>
+  `
+})
+export class BookListComponent implements OnInit {
+  books: any[] = [];
+  pageNumber = 0;
+  pageSize = 10;
+  totalPages = 0;
+  totalElements = 0;
+  search = '';
+  sortBy = 'title';
+  sortDirection = 'ASC';
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.loadBooks();
+  }
+
+  loadBooks() {
+    let params = new HttpParams()
+      .set('page', this.pageNumber.toString())
+      .set('size', this.pageSize.toString())
+      .set('sortBy', this.sortBy)
+      .set('sortDirection', this.sortDirection);
+    
+    if (this.search) {
+      params = params.set('search', this.search);
+    }
+
+    this.http.get<PageResponse<any>>('http://localhost:8086/api/books', { params })
+      .subscribe(data => {
+        this.books = data.content;
+        this.pageNumber = data.pageNumber;
+        this.totalPages = data.totalPages;
+        this.totalElements = data.totalElements;
+      });
+  }
+
+  onSearchChange() {
+    this.pageNumber = 0; // Reset về trang đầu khi search
+    this.loadBooks();
+  }
+
+  toggleSort() {
+    this.sortDirection = this.sortDirection === 'ASC' ? 'DESC' : 'ASC';
+    this.loadBooks();
+  }
+
+  previousPage() {
+    if (this.pageNumber > 0) {
+      this.pageNumber--;
+      this.loadBooks();
+    }
+  }
+
+  nextPage() {
+    if (this.pageNumber < this.totalPages - 1) {
+      this.pageNumber++;
+      this.loadBooks();
+    }
+  }
+}
+```
+
+### Sortable Fields
+
+#### Books
+- `id` - ID sách
+- `title` - Tiêu đề
+- `author` - Tác giả
+- `category` - Thể loại
+- `status` - Trạng thái
+- `createAt` - Ngày tạo
+- `updateAt` - Ngày cập nhật
+
+#### Users
+- `id` - ID user
+- `email` - Email
+- `fullName` - Tên đầy đủ
+- `createAt` - Ngày tạo
+- `updateAt` - Ngày cập nhật
+
+### Tips & Best Practices
+
+1. **Luôn validate input:**
+   - page >= 0
+   - size: 1-100
+   - sortDirection: chỉ ASC/DESC
+
+2. **Reset page về 0 khi search:**
+   - Tránh trường hợp search có 2 trang nhưng đang ở trang 3
+
+3. **Debounce search input:**
+   - Tránh gọi API quá nhiều khi user đang gõ
+   ```javascript
+   const debounce = (func, delay) => {
+       let timeoutId;
+       return (...args) => {
+           clearTimeout(timeoutId);
+           timeoutId = setTimeout(() => func(...args), delay);
+       };
+   };
+   
+   const debouncedSearch = debounce(fetchBooks, 500);
+   ```
+
+4. **Cache results:**
+   - Cache trang đã load để tăng performance
+   - Invalidate cache khi có thay đổi
+
+5. **Show loading state:**
+   - Hiển thị loading indicator khi đang fetch data
+   - Improve user experience
+
+6. **Handle errors gracefully:**
+   ```javascript
+   try {
+       const data = await fetchBooks();
+   } catch (error) {
+       console.error('Error fetching books:', error);
+       // Show error message to user
+   }
+   ```
 
 ---
 

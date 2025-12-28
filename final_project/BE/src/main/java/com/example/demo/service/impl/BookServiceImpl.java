@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,10 +23,33 @@ public class BookServiceImpl implements BookService {
     private BookRepository bookRepository;
 
     @Override
-    public ResponseEntity<?> getAllBooks(int page, int size) {
+    public ResponseEntity<?> getAllBooks(com.example.demo.dto.request.PageRequest pageRequest) {
         try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Book> bookPage = bookRepository.findAll(pageable);
+            Pageable pageable;
+
+            // Tạo Pageable với sorting nếu có sortBy
+            if (pageRequest.getSortBy() != null && !pageRequest.getSortBy().isEmpty()) {
+                Sort sort = Sort.by(
+                    "DESC".equalsIgnoreCase(pageRequest.getSortDirection())
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC,
+                    pageRequest.getSortBy()
+                );
+                pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
+            } else {
+                pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize());
+            }
+
+            Page<Book> bookPage;
+
+            // Kiểm tra nếu có search keyword thì dùng searchBooks, không thì findAll
+            if (pageRequest.getSearch() != null && !pageRequest.getSearch().trim().isEmpty()) {
+                // Có search keyword -> tìm kiếm theo title, author hoặc category
+                bookPage = bookRepository.searchBooks(pageRequest.getSearch().trim(), pageable);
+            } else {
+                // Không có search keyword -> lấy tất cả books
+                bookPage = bookRepository.findAll(pageable);
+            }
 
             PageResponse<Book> pageResponse = new PageResponse<>(
                     bookPage.getContent(),

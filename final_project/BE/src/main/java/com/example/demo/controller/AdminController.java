@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.request.PageRequest;
 import com.example.demo.dto.request.UpdateUserRoleRequest;
 import com.example.demo.service.AdminService;
 import jakarta.validation.Valid;
@@ -17,9 +18,8 @@ public class AdminController {
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return adminService.getAllUsers(page, size);
+            @ModelAttribute PageRequest pageRequest) {
+        return adminService.getAllUsers(pageRequest);
     }
 
     @PutMapping("/users/{userId}/role")

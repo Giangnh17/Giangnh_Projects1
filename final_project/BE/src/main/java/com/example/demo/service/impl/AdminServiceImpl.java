@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -83,10 +84,33 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public ResponseEntity<?> getAllUsers(int page, int size) {
+    public ResponseEntity<?> getAllUsers(com.example.demo.dto.request.PageRequest pageRequest) {
         try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<User> userPage = userRepository.findAll(pageable);
+            Pageable pageable;
+
+            // Tạo Pageable với sorting nếu có sortBy
+            if (pageRequest.getSortBy() != null && !pageRequest.getSortBy().isEmpty()) {
+                Sort sort = Sort.by(
+                    "DESC".equalsIgnoreCase(pageRequest.getSortDirection())
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC,
+                    pageRequest.getSortBy()
+                );
+                pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
+            } else {
+                pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize());
+            }
+
+            Page<User> userPage;
+
+            // Kiểm tra nếu có search keyword thì dùng searchUsers, không thì findAll
+            if (pageRequest.getSearch() != null && !pageRequest.getSearch().trim().isEmpty()) {
+                // Có search keyword -> tìm kiếm theo email hoặc fullName
+                userPage = userRepository.searchUsers(pageRequest.getSearch().trim(), pageable);
+            } else {
+                // Không có search keyword -> lấy tất cả users
+                userPage = userRepository.findAll(pageable);
+            }
 
             PageResponse<User> pageResponse = new PageResponse<>(
                     userPage.getContent(),
