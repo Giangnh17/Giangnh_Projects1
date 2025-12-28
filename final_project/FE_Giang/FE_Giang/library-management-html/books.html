@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Sách - Sarly Library</title>
+  
+  <link rel="icon" type="image/png" href="./assets/images/Library_logo.png">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Noto+Serif:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="./assets/css/variables.css">
+  <link rel="stylesheet" href="./assets/css/global.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/responsive.css">
+  <link rel="stylesheet" href="./assets/css/pages/books.css">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="layout">
+    <div class="layout-content" id="layoutContent">
+      <main class="main-content">
+        <div class="content-header">
+          <div class="content-header-top">
+            <h2 class="content-title">Quản Lý Sách</h2>
+            <div class="content-actions">
+              <button class="btn btn-primary" onclick="openBookModal()" data-role-required="LIBRARIAN">
+                <i class="fas fa-plus"></i>
+                Thêm sách mới
+              </button>
+            </div>
+          </div>
+          <p class="content-description">Quản lý danh sách sách trong thư viện</p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row">
+              <div class="col col-md-8">
+                <div class="search-box">
+                  <i class="fas fa-search search-icon"></i>
+                  <input 
+                    type="text" 
+                    class="search-input form-control" 
+                    id="searchInput" 
+                    placeholder="Tìm kiếm sách (tên, tác giả, thể loại)..."
+                  >
+                </div>
+              </div>
+              <div class="col col-md-4">
+                <select class="form-control" id="sortBy">
+                  <option value="title">Sắp xếp: Tên A-Z</option>
+                  <option value="author">Sắp xếp: Tác giả</option>
+                  <option value="category">Sắp xếp: Thể loại</option>
+                  <option value="status">Sắp xếp: Trạng thái</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Books Table -->
+        <div class="card">
+          <div class="card-body">
+            <div id="booksTable">
+              ${Components.getLoadingHTML()}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Book Modal -->
+  <div class="modal-backdrop" id="bookModal-backdrop"></div>
+  <div class="modal" id="bookModal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Thêm sách mới</h3>
+      <button class="modal-close" onclick="closeBookModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="bookForm">
+        <input type="hidden" id="bookId">
+        
+        <div class="row">
+          <div class="col col-md-12">
+            <div class="form-group">
+              <label for="title" class="form-label required">Tên sách</label>
+              <input type="text" id="title" class="form-control" required placeholder="Nhập tên sách">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="author" class="form-label required">Tác giả</label>
+              <input type="text" id="author" class="form-control" required placeholder="Nhập tên tác giả">
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group">
+              <label for="category" class="form-label required">Thể loại</label>
+              <input 
+                type="text" 
+                id="category" 
+                class="form-control" 
+                required 
+                placeholder="Nhập thể loại (VD: Văn học, Khoa học...)" 
+                list="categoryList"
+              >
+              <datalist id="categoryList">
+                <option value="Văn học">
+                <option value="Khoa học">
+                <option value="Lịch sử">
+                <option value="Triết học">
+                <option value="Kinh tế">
+                <option value="Công nghệ">
+                <option value="Nghệ thuật">
+                <option value="Tiểu thuyết">
+                <option value="Truyện ngắn">
+                <option value="Tâm lý học">
+                <option value="Giáo dục">
+              </datalist>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col col-md-12">
+            <div class="form-group">
+              <label for="status" class="form-label required">Trạng thái</label>
+              <select id="status" class="form-control" required>
+                <option value="">Chọn trạng thái</option>
+                <option value="AVAILABLE">Có sẵn</option>
+                <option value="BORROWED">Đang mượn</option>
+                <option value="UNAVAILABLE">Không có sẵn</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeBookModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveBook()">
+        <i class="fas fa-save"></i>
+        Lưu
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  <script src="./assets/js/components.js"></script>
+  <script src="./assets/js/pages/books.js"></script>
+</body>
+</html>
