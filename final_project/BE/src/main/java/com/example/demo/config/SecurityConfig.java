@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/books").permitAll()  // GET books - public
                         .requestMatchers("/api/books/{id}").permitAll()  // GET book by id - public
                         .requestMatchers("/api/books/**").hasAnyRole("ADMIN", "LIBRARIAN")  // Create, Update, Delete - Admin & Librarian only
+                        .requestMatchers("/api/dashboard/**").hasAnyRole("ADMIN", "LIBRARIAN")  // Dashboard - Admin & Librarian only
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "LIBRARIAN")
                         .anyRequest().authenticated())

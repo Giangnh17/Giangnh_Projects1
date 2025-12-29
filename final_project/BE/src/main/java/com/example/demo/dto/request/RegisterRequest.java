@@ -12,7 +12,7 @@ public class RegisterRequest {
             )
     private String email;
     @NotBlank(message = "Tên không được để trống")
-    private String name;
+    private String fullName;
     @NotBlank(message = "Mật khẩu không được để trống")
     @Size(min = 6, message = "Mật khẩu phải có ít nhất 6 ký tự")
     private String password;
@@ -25,12 +25,12 @@ public class RegisterRequest {
         this.email = email;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getPassword() {

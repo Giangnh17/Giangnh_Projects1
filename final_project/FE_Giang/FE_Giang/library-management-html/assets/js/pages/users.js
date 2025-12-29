@@ -21,9 +21,9 @@ async function initUsers() {
   try {
     // Insert sidebar and header
     const sidebarHTML = Components.getSidebarHTML();
-    const headerHTML = Components.getHeaderHTML('Quản Lý Người Dùng', [
+    const headerHTML = Components.getHeaderHTML('Quản lý người dùng', [
       { text: 'Trang chủ', href: '/dashboard.html' },
-      { text: 'Người dùng' }
+      { text: 'Quản lý người dùng' }
     ]);
 
     document.querySelector('.layout').insertAdjacentHTML('afterbegin', sidebarHTML);

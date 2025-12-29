@@ -527,112 +527,30 @@ const AdminAPI = {
 };
 
 // ========================================
-// STATISTICS API
-// NOTE: These functions calculate stats from CLIENT-SIDE data only
-// For accurate statistics, backend should provide dedicated /api/stats endpoint
-// Current implementation is a fallback for when backend stats API is not available
-// TODO: Replace with backend API call when available
+// DASHBOARD API
 // ========================================
 
-const StatsAPI = {
+const DashboardAPI = {
   /**
-   * Calculate statistics from books data (CLIENT-SIDE - NOT ACCURATE FOR LARGE DATASETS)
-   * Backend Book model: { id, title, author, category, status, createAt, updateAt, isDeleted }
-   * Status: AVAILABLE, BORROWED, UNAVAILABLE
-   * 
-   * ⚠️ WARNING: This calculates from paginated data, NOT full dataset
-   * For accurate stats, backend should provide /api/stats/books endpoint
-   * 
-   * @param {Array} books - List of books (from current page only)
-   * @returns {Object} Statistics object
+   * Get dashboard statistics
+   * GET /api/dashboard/stats
+   * Requires: ADMIN or LIBRARIAN role
+   * @returns {Promise<Object>} Dashboard statistics
+   * {
+   *   totalBooks: number,
+   *   availableBooks: number,
+   *   borrowedBooks: number,
+   *   categoryStats: { [category: string]: number },
+   *   statusStats: { [status: string]: number }
+   * }
    */
-  calculateStats(books) {
-    if (!books || books.length === 0) {
-      return {
-        totalBooks: 0,
-        availableBooks: 0,
-        borrowedBooks: 0,
-        unavailableBooks: 0,
-        categories: 0
-      };
+  async getStats() {
+    try {
+      const response = await http.get('/api/dashboard/stats');
+      return response;
+    } catch (error) {
+      throw new Error(error.message || 'Không thể tải thống kê dashboard');
     }
-
-    const totalBooks = books.length;
-    const availableBooks = books.filter(b => b.status === 'AVAILABLE').length;
-    const borrowedBooks = books.filter(b => b.status === 'BORROWED').length;
-    const unavailableBooks = books.filter(b => b.status === 'UNAVAILABLE').length;
-    
-    // Get unique categories from current page only
-    const uniqueCategories = new Set();
-    books.forEach(book => {
-      if (book.category) uniqueCategories.add(book.category);
-    });
-    const categories = uniqueCategories.size;
-
-    return {
-      totalBooks,
-      availableBooks,
-      borrowedBooks,
-      unavailableBooks,
-      categories
-    };
-  },
-
-  /**
-   * Get books by category with counts (CLIENT-SIDE)
-   * ⚠️ WARNING: This only counts from provided books array (current page)
-   * For accurate category stats, use backend API
-   * 
-   * @param {Array} books - List of books
-   * @returns {Array} Category statistics
-   */
-  getCategoryStats(books) {
-    const categoryMap = {};
-    
-    books.forEach(book => {
-      const category = book.category || 'Uncategorized';
-      if (!categoryMap[category]) {
-        categoryMap[category] = {
-          name: category,
-          count: 0,
-          available: 0
-        };
-      }
-      categoryMap[category].count += 1;
-      if (book.status === 'AVAILABLE') {
-        categoryMap[category].available += 1;
-      }
-    });
-
-    return Object.values(categoryMap).sort((a, b) => b.count - a.count);
-  },
-
-  /**
-   * Get top authors by book count (CLIENT-SIDE)
-   * ⚠️ WARNING: This only counts from provided books array (current page)
-   * For accurate author stats, use backend API
-   * 
-   * @param {Array} books - List of books
-   * @param {number} limit - Number of top authors
-   * @returns {Array} Top authors
-   */
-  getTopAuthors(books, limit = 5) {
-    const authorMap = {};
-    
-    books.forEach(book => {
-      const author = book.author || 'Unknown';
-      if (!authorMap[author]) {
-        authorMap[author] = {
-          name: author,
-          bookCount: 0
-        };
-      }
-      authorMap[author].bookCount += 1;
-    });
-
-    return Object.values(authorMap)
-      .sort((a, b) => b.bookCount - a.bookCount)
-      .slice(0, limit);
   }
 };
 
@@ -645,7 +563,7 @@ window.API = {
   Books: BooksAPI,
   User: UserAPI,
   Admin: AdminAPI,
-  Stats: StatsAPI
+  Dashboard: DashboardAPI
 };
 
 // Also export individual APIs for convenience
@@ -653,4 +571,4 @@ window.AuthAPI = AuthAPI;
 window.BooksAPI = BooksAPI;
 window.UserAPI = UserAPI;
 window.AdminAPI = AdminAPI;
-window.StatsAPI = StatsAPI;
+window.DashboardAPI = DashboardAPI;

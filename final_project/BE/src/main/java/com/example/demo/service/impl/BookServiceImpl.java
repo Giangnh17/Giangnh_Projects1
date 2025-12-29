@@ -42,13 +42,13 @@ public class BookServiceImpl implements BookService {
 
             Page<Book> bookPage;
 
-            // Kiểm tra nếu có search keyword thì dùng searchBooks, không thì findAll
+            // Kiểm tra nếu có search keyword thì dùng searchBooks, không thì findAllNotDeleted
             if (pageRequest.getSearch() != null && !pageRequest.getSearch().trim().isEmpty()) {
-                // Có search keyword -> tìm kiếm theo title, author hoặc category
+                // Có search keyword -> tìm kiếm theo title, author hoặc category (chỉ lấy book chưa xóa)
                 bookPage = bookRepository.searchBooks(pageRequest.getSearch().trim(), pageable);
             } else {
-                // Không có search keyword -> lấy tất cả books
-                bookPage = bookRepository.findAll(pageable);
+                // Không có search keyword -> lấy tất cả books chưa bị xóa
+                bookPage = bookRepository.findAllNotDeleted(pageable);
             }
 
             PageResponse<Book> pageResponse = new PageResponse<>(

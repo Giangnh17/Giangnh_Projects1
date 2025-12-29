@@ -26,7 +26,7 @@ const Components = {
           <div class="sidebar-section">
             <div class="sidebar-section-title">Menu Chính</div>
             <ul>
-              <li class="nav-item">
+              <li class="nav-item" data-role-required="LIBRARIAN">
                 <a href="./dashboard.html" class="nav-link">
                   <i class="fas fa-home nav-icon"></i>
                   <span class="nav-text">Trang chủ</span>
@@ -35,13 +35,13 @@ const Components = {
               <li class="nav-item">
                 <a href="./books.html" class="nav-link">
                   <i class="fas fa-book nav-icon"></i>
-                  <span class="nav-text">Quản lý sách</span>
+                  <span class="nav-text">Thư viện sách</span>
                 </a>
               </li>
               <li class="nav-item" data-role-required="ADMIN">
                 <a href="./users.html" class="nav-link">
                   <i class="fas fa-users nav-icon"></i>
-                  <span class="nav-text">Người dùng</span>
+                  <span class="nav-text">Quản lý người dùng</span>
                 </a>
               </li>
             </ul>

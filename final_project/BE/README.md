@@ -7,6 +7,7 @@
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
 - [Database Schema](#database-schema)
 - [API Endpoints](#api-endpoints)
+- [Dashboard Statistics](#dashboard-statistics)
 - [Phân trang, Sắp xếp và Tìm kiếm](#phân-trang-sắp-xếp-và-tìm-kiếm)
 - [Authentication & Authorization](#authentication--authorization)
 - [Hướng dẫn cài đặt](#hướng-dẫn-cài-đặt)
@@ -75,7 +76,16 @@
 - ✅ Update full name (USER, LIBRARIAN)
 - ✅ Bảo vệ: Không thể xóa hoặc thay đổi ADMIN
 
-### 4. Tính năng kỹ thuật
+### 4. Dashboard & Statistics (ADMIN, LIBRARIAN)
+- ✅ Tổng số sách trong hệ thống
+- ✅ Số sách có sẵn (AVAILABLE)
+- ✅ Số sách đang được mượn (BORROWED)
+- ✅ Thống kê số sách theo danh mục (category) - cho biểu đồ cột
+- ✅ Thống kê số sách theo trạng thái (status) - cho pie chart
+- ✅ Real-time data, không cache
+- ✅ Phân quyền: Chỉ ADMIN và LIBRARIAN truy cập
+
+### 5. Tính năng kỹ thuật
 - ✅ Soft delete pattern (isDeleted flag)
 - ✅ Automatic timestamps (createdAt, updatedAt)
 - ✅ Global Exception Handler
@@ -101,17 +111,20 @@ src/main/java/com/example/demo/
 │   ├── AuthController.java          # Auth endpoints (login, register, profile)
 │   ├── BookController.java          # Book management endpoints
 │   ├── AdminController.java         # Admin management endpoints
+│   ├── DashboardController.java     # Dashboard statistics endpoints (ADMIN, LIBRARIAN)
 │   └── UserController.java          # User profile endpoints
 │
 ├── service/                         # Service Interfaces
 │   ├── AuthService.java
 │   ├── BookService.java
 │   ├── AdminService.java
+│   ├── DashboardService.java        # Dashboard statistics service
 │   ├── UserService.java
 │   └── impl/                        # Service Implementations
 │       ├── AuthServiceImpl.java
 │       ├── BookServiceImpl.java
 │       ├── AdminServiceImpl.java
+│       ├── DashboardServiceImpl.java
 │       └── UserServiceImpl.java
 │
 ├── repository/                      # JPA Repositories
@@ -136,7 +149,8 @@ src/main/java/com/example/demo/
 │   │   └── PageRequest.java         # DTO cho pagination, sorting, search
 │   └── response/
 │       ├── UserProfileResponse.java
-│       └── PageResponse.java        # Generic response cho pagination
+│       ├── PageResponse.java        # Generic response cho pagination
+│       └── DashboardStatsResponse.java  # Response cho dashboard statistics
 │
 └── FinalProjectApplication.java     # Main application class
 
@@ -453,6 +467,47 @@ Note: ADMIN không được phép dùng API này
 
 ---
 
+### 📊 Dashboard APIs (`/api/dashboard`) - ADMIN, LIBRARIAN Only
+
+#### Get Dashboard Statistics
+```http
+GET /api/dashboard/stats
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+    "totalBooks": 10,
+    "availableBooks": 6,
+    "borrowedBooks": 3,
+    "categoryStats": {
+        "Children": 4,
+        "Romance": 2,
+        "Fantasy": 1,
+        "Classics": 1,
+        "Young Adult": 1,
+        "Self-help": 1
+    },
+    "statusStats": {
+        "AVAILABLE": 6,
+        "BORROWED": 3,
+        "DAMAGED": 1
+    }
+}
+
+Description:
+- totalBooks: Tổng số sách trong hệ thống (không bao gồm sách đã xóa)
+- availableBooks: Số sách có sẵn để mượn (status = "AVAILABLE")
+- borrowedBooks: Số sách đang được mượn (status = "BORROWED")
+- categoryStats: Object chứa số lượng sách theo từng danh mục (cho biểu đồ cột)
+- statusStats: Object chứa số lượng sách theo trạng thái (cho pie chart)
+
+Note: 
+- Chỉ ADMIN và LIBRARIAN có quyền truy cập endpoint này
+- Dữ liệu chỉ bao gồm sách chưa bị xóa (isDeleted = false)
+```
+
+---
+
 ## 📄 Phân trang, Sắp xếp và Tìm kiếm
 
 ### PageRequest DTO
@@ -576,6 +631,7 @@ fetchBooks(0, 10, 'title', 'ASC', 'java')
 - `DELETE /admin/users/{userId}`
 
 **ADMIN + LIBRARIAN:**
+- `GET /api/dashboard/stats` (Dashboard statistics)
 - `POST /api/books`
 - `PUT /api/books/{id}`
 - `DELETE /api/books/{id}`
@@ -1506,6 +1562,367 @@ export class BookListComponent implements OnInit {
 4. **Cache results:**
    - Cache trang đã load để tăng performance
    - Invalidate cache khi có thay đổi
+
+---
+
+### 📊 Dashboard Integration (ADMIN/LIBRARIAN Only)
+
+Dashboard API cung cấp thống kê tổng quan về sách trong hệ thống, bao gồm:
+- Tổng số sách, sách có sẵn, sách đang mượn
+- Thống kê theo danh mục (cho biểu đồ cột)
+- Thống kê theo trạng thái (cho pie chart)
+
+#### React Example - Dashboard Component
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+function Dashboard() {
+    const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(true);
+    
+    // Colors cho pie chart
+    const COLORS = ['#4CAF50', '#FF9800', '#F44336', '#2196F3'];
+
+    useEffect(() => {
+        fetchDashboardStats();
+    }, []);
+
+    const fetchDashboardStats = async () => {
+        try {
+            const token = localStorage.getItem('token'); // Lấy JWT token
+            const response = await fetch('http://localhost:8086/api/dashboard/stats', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                setStats(data);
+            } else {
+                console.error('Failed to fetch dashboard stats');
+            }
+        } catch (error) {
+            console.error('Error fetching dashboard stats:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) return <div>Đang tải...</div>;
+    if (!stats) return <div>Không có dữ liệu</div>;
+
+    // Chuyển đổi categoryStats object thành array cho biểu đồ cột
+    const categoryData = Object.entries(stats.categoryStats).map(([name, value]) => ({
+        name,
+        count: value
+    }));
+
+    // Chuyển đổi statusStats object thành array cho pie chart
+    const statusData = Object.entries(stats.statusStats).map(([name, value]) => ({
+        name,
+        value
+    }));
+
+    return (
+        <div className="dashboard">
+            <h1>Dashboard - Thống kê thư viện</h1>
+            
+            {/* Summary Cards */}
+            <div className="stats-cards">
+                <div className="card">
+                    <h3>Tổng số sách</h3>
+                    <p className="number">{stats.totalBooks}</p>
+                </div>
+                
+                <div className="card available">
+                    <h3>Sách có sẵn</h3>
+                    <p className="number">{stats.availableBooks}</p>
+                </div>
+                
+                <div className="card borrowed">
+                    <h3>Sách đang mượn</h3>
+                    <p className="number">{stats.borrowedBooks}</p>
+                </div>
+            </div>
+
+            {/* Bar Chart - Thống kê theo danh mục */}
+            <div className="chart-container">
+                <h2>Thống kê theo danh mục</h2>
+                <BarChart width={600} height={300} data={categoryData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="count" fill="#8884d8" name="Số lượng sách" />
+                </BarChart>
+            </div>
+
+            {/* Pie Chart - Tình trạng sách */}
+            <div className="chart-container">
+                <h2>Tình trạng sách</h2>
+                <PieChart width={400} height={400}>
+                    <Pie
+                        data={statusData}
+                        cx={200}
+                        cy={200}
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                    >
+                        {statusData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                </PieChart>
+            </div>
+        </div>
+    );
+}
+
+export default Dashboard;
+```
+
+#### CSS cho Dashboard
+
+```css
+.dashboard {
+    padding: 20px;
+}
+
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.card h3 {
+    margin: 0 0 10px 0;
+    color: #666;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.card .number {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+.card.available .number {
+    color: #4CAF50;
+}
+
+.card.borrowed .number {
+    color: #FF9800;
+}
+
+.chart-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.chart-container h2 {
+    margin-top: 0;
+    color: #333;
+}
+```
+
+#### Vanilla JavaScript Example (Không dùng library charts)
+
+```javascript
+// Fetch dashboard stats
+async function loadDashboard() {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch('http://localhost:8086/api/dashboard/stats', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const stats = await response.json();
+        
+        // Update summary cards
+        document.getElementById('total-books').textContent = stats.totalBooks;
+        document.getElementById('available-books').textContent = stats.availableBooks;
+        document.getElementById('borrowed-books').textContent = stats.borrowedBooks;
+        
+        // Render category chart
+        renderCategoryChart(stats.categoryStats);
+        
+        // Render status chart
+        renderStatusChart(stats.statusStats);
+        
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+    }
+}
+
+// Render simple bar chart
+function renderCategoryChart(categoryStats) {
+    const chartContainer = document.getElementById('category-chart');
+    chartContainer.innerHTML = ''; // Clear previous content
+    
+    const maxValue = Math.max(...Object.values(categoryStats));
+    
+    Object.entries(categoryStats).forEach(([category, count]) => {
+        const bar = document.createElement('div');
+        bar.className = 'chart-bar';
+        
+        const barFill = document.createElement('div');
+        barFill.className = 'bar-fill';
+        barFill.style.width = `${(count / maxValue) * 100}%`;
+        barFill.textContent = count;
+        
+        const barLabel = document.createElement('div');
+        barLabel.className = 'bar-label';
+        barLabel.textContent = category;
+        
+        bar.appendChild(barLabel);
+        bar.appendChild(barFill);
+        chartContainer.appendChild(bar);
+    });
+}
+
+// Render simple pie chart (table format)
+function renderStatusChart(statusStats) {
+    const chartContainer = document.getElementById('status-chart');
+    chartContainer.innerHTML = '';
+    
+    const total = Object.values(statusStats).reduce((a, b) => a + b, 0);
+    
+    Object.entries(statusStats).forEach(([status, count]) => {
+        const percentage = ((count / total) * 100).toFixed(1);
+        
+        const row = document.createElement('div');
+        row.className = 'status-row';
+        row.innerHTML = `
+            <span class="status-name">${status}</span>
+            <span class="status-count">${count} (${percentage}%)</span>
+            <div class="status-bar" style="width: ${percentage}%"></div>
+        `;
+        
+        chartContainer.appendChild(row);
+    });
+}
+
+// Call on page load
+document.addEventListener('DOMContentLoaded', loadDashboard);
+```
+
+#### HTML cho Vanilla JS
+
+```html
+<div class="dashboard">
+    <h1>Dashboard</h1>
+    
+    <!-- Summary Cards -->
+    <div class="stats-cards">
+        <div class="card">
+            <h3>Tổng số sách</h3>
+            <p class="number" id="total-books">0</p>
+        </div>
+        <div class="card available">
+            <h3>Sách có sẵn</h3>
+            <p class="number" id="available-books">0</p>
+        </div>
+        <div class="card borrowed">
+            <h3>Sách đang mượn</h3>
+            <p class="number" id="borrowed-books">0</p>
+        </div>
+    </div>
+    
+    <!-- Category Chart -->
+    <div class="chart-container">
+        <h2>Thống kê theo danh mục</h2>
+        <div id="category-chart"></div>
+    </div>
+    
+    <!-- Status Chart -->
+    <div class="chart-container">
+        <h2>Tình trạng sách</h2>
+        <div id="status-chart"></div>
+    </div>
+</div>
+```
+
+#### Important Notes cho Dashboard:
+
+1. **Authentication Required:**
+   - Phải gửi JWT token trong header `Authorization: Bearer <token>`
+   - Chỉ ADMIN và LIBRARIAN có quyền truy cập
+   - Nếu token hết hạn hoặc không đủ quyền → trả về 403 Forbidden
+
+2. **Response Structure:**
+   ```javascript
+   {
+       totalBooks: 10,           // Number - tổng số sách
+       availableBooks: 6,        // Number - sách có sẵn
+       borrowedBooks: 3,         // Number - sách đang mượn
+       categoryStats: {          // Object - key: category name, value: count
+           "Children": 4,
+           "Romance": 2,
+           "Fantasy": 1
+       },
+       statusStats: {            // Object - key: status, value: count
+           "AVAILABLE": 6,
+           "BORROWED": 3,
+           "DAMAGED": 1
+       }
+   }
+   ```
+
+3. **Libraries gợi ý cho Charts:**
+   - **Recharts** (React) - Dễ sử dụng, responsive
+   - **Chart.js** (Vanilla JS) - Popular, nhiều loại chart
+   - **ApexCharts** - Modern, đẹp, interactive
+   - **D3.js** - Mạnh mẽ nhưng phức tạp
+
+4. **Auto-refresh Dashboard:**
+   ```javascript
+   // Refresh mỗi 30 giây
+   useEffect(() => {
+       const interval = setInterval(fetchDashboardStats, 30000);
+       return () => clearInterval(interval);
+   }, []);
+   ```
+
+5. **Error Handling:**
+   ```javascript
+   if (response.status === 403) {
+       // Không đủ quyền
+       alert('Bạn không có quyền truy cập dashboard');
+       router.push('/login');
+   } else if (response.status === 401) {
+       // Token hết hạn
+       alert('Phiên đăng nhập đã hết hạn');
+       router.push('/login');
+   }
+   ```
 
 5. **Show loading state:**
    - Hiển thị loading indicator khi đang fetch data

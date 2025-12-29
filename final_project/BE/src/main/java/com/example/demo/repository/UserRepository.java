@@ -12,12 +12,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(@Param("email") String email);
 
     /**
+     * Lấy tất cả users chưa bị xóa (isDeleted = false)
+     */
+    @Query("SELECT u FROM User u WHERE u.isDeleted = false")
+    Page<User> findAllNotDeleted(Pageable pageable);
+
+    /**
      * Tìm kiếm user theo email hoặc fullName
+     * Chỉ lấy các user chưa bị xóa (isDeleted = false)
      * LOWER() để không phân biệt hoa thường
      * %keyword% để tìm kiếm có chứa từ khóa
      */
-    @Query("SELECT u FROM User u WHERE " +
+    @Query("SELECT u FROM User u WHERE u.isDeleted = false AND (" +
            "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<User> searchUsers(@Param("keyword") String keyword, Pageable pageable);
 }

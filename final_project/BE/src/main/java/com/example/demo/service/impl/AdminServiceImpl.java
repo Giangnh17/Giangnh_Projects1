@@ -103,13 +103,13 @@ public class AdminServiceImpl implements AdminService {
 
             Page<User> userPage;
 
-            // Kiểm tra nếu có search keyword thì dùng searchUsers, không thì findAll
+            // Kiểm tra nếu có search keyword thì dùng searchUsers, không thì findAllNotDeleted
             if (pageRequest.getSearch() != null && !pageRequest.getSearch().trim().isEmpty()) {
-                // Có search keyword -> tìm kiếm theo email hoặc fullName
+                // Có search keyword -> tìm kiếm theo email hoặc fullName (chỉ lấy user chưa xóa)
                 userPage = userRepository.searchUsers(pageRequest.getSearch().trim(), pageable);
             } else {
-                // Không có search keyword -> lấy tất cả users
-                userPage = userRepository.findAll(pageable);
+                // Không có search keyword -> lấy tất cả users chưa bị xóa
+                userPage = userRepository.findAllNotDeleted(pageable);
             }
 
             PageResponse<User> pageResponse = new PageResponse<>(

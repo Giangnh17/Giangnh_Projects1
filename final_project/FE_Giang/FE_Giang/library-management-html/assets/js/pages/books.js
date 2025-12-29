@@ -25,9 +25,9 @@ async function initBooks() {
   try {
     // Insert sidebar and header
     const sidebarHTML = Components.getSidebarHTML();
-    const headerHTML = Components.getHeaderHTML('Quản Lý Sách', [
+    const headerHTML = Components.getHeaderHTML('Thư viện sách', [
       { text: 'Trang chủ', href: '/dashboard.html' },
-      { text: 'Quản lý sách' }
+      { text: 'Thư viện sách' }
     ]);
 
     document.querySelector('.layout').insertAdjacentHTML('afterbegin', sidebarHTML);
